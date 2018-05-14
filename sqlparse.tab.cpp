@@ -73,6 +73,7 @@ using namespace std;
 #include"tables.h"
 #define yydebug
 //#define YYSTYLE double
+//#define YYSTYLE char*
 extern void yyerror(char*);
 void yyerror(const char*);
 extern int yylex(void);
@@ -80,6 +81,10 @@ int flag_kv = 0;
 int flag = 0;
 int flag_sel=0;
 int flag_sel_val=0;
+int flag_exit=0;
+int flag_update_table=0;
+int flag_delete_table=0;
+int flag_select_table=0;
 
 int colp = -1;//属性指针,colp+1就是当前表属性个数
 int valp = -1;//元组指针,标注当前操作元素位置
@@ -92,9 +97,14 @@ int t=0;
 int col_search;
 int ifinsert=1;
 bool flag_col=true;
+int ifgoback=0;
+int val_num_count=0;
+int val_num_count_flag=0;
+
 string temp1;
 string temp2;
 string updatetemp;
+string tablename;
 extern int flag_ifint;
 extern string temp;
 extern string tempnum;
@@ -103,7 +113,7 @@ extern int flag_comp;
 extern int flag_ifdou;
 table tt[10];//最多可以建十个表
 
-#line 107 "sqlparse.tab.cpp" /* yacc.c:339  */
+#line 117 "sqlparse.tab.cpp" /* yacc.c:339  */
 
 # ifndef YY_NULLPTR
 #  if defined __cplusplus && 201103L <= __cplusplus
@@ -177,14 +187,14 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 44 "sqlparse.ypp" /* yacc.c:355  */
+#line 54 "sqlparse.ypp" /* yacc.c:355  */
 
     int intval;       
     double floatval;      
-    char* strval;  
+    char strval[16];  
     //int subtok; 
 
-#line 188 "sqlparse.tab.cpp" /* yacc.c:355  */
+#line 198 "sqlparse.tab.cpp" /* yacc.c:355  */
 };
 
 typedef union YYSTYPE YYSTYPE;
@@ -201,7 +211,7 @@ int yyparse (void);
 
 /* Copy the second part of user declarations.  */
 
-#line 205 "sqlparse.tab.cpp" /* yacc.c:358  */
+#line 215 "sqlparse.tab.cpp" /* yacc.c:358  */
 
 #ifdef short
 # undef short
@@ -443,16 +453,16 @@ union yyalloc
 /* YYFINAL -- State number of the termination state.  */
 #define YYFINAL  2
 /* YYLAST -- Last index in YYTABLE.  */
-#define YYLAST   133
+#define YYLAST   125
 
 /* YYNTOKENS -- Number of terminals.  */
 #define YYNTOKENS  44
 /* YYNNTS -- Number of nonterminals.  */
-#define YYNNTS  22
+#define YYNNTS  26
 /* YYNRULES -- Number of rules.  */
-#define YYNRULES  59
+#define YYNRULES  62
 /* YYNSTATES -- Number of states.  */
-#define YYNSTATES  117
+#define YYNSTATES  119
 
 /* YYTRANSLATE[YYX] -- Symbol number corresponding to YYX as returned
    by yylex, with out-of-bounds checking.  */
@@ -501,12 +511,13 @@ static const yytype_uint8 yytranslate[] =
   /* YYRLINE[YYN] -- Source line where rule number YYN was defined.  */
 static const yytype_uint16 yyrline[] =
 {
-       0,    91,    91,    95,    99,   102,   103,   104,   105,   106,
-     107,   110,   113,   124,   125,   126,   129,   139,   142,   145,
-     148,   151,   153,   154,   157,   160,   163,   166,   172,   174,
-     175,   178,   179,   182,   185,   188,   239,   240,   290,   294,
-     304,   307,   311,   316,   318,   321,   324,   329,   341,   350,
-     359,   399,   400,   401,   402,   403,   406,   415,   423,   457
+       0,   101,   101,   105,   112,   115,   116,   117,   118,   119,
+     120,   123,   126,   139,   144,   145,   146,   149,   159,   162,
+     165,   168,   171,   173,   174,   177,   180,   183,   186,   192,
+     204,   215,   216,   219,   220,   223,   232,   244,   294,   295,
+     342,   346,   359,   371,   374,   378,   383,   386,   391,   403,
+     412,   421,   461,   462,   463,   464,   465,   468,   480,   492,
+     504,   517,   551
 };
 #endif
 
@@ -521,11 +532,13 @@ static const char *const yytname[] =
   "DELETE", "FROM", "SELECT", "WHERE", "UPDATE", "SET", "CHECK", "VALUES",
   "NAME", "INTNUM", "DOUNUM", "DECIMAL", "STRING", "COMPARISON", "ANDOP",
   "OR", "';'", "'\\n'", "'('", "')'", "','", "$accept", "start", "stmt",
-  "create_database_stmt", "create_table_stmt", "create_col_list",
-  "create_definition", "data_type", "column_atts", "insert_stmt",
-  "opt_col_names", "column_list", "insert_vals_list", "insert_vals",
-  "select_stmt", "select_expr_list", "table_references", "opt_where",
-  "expr", "delete_stmt", "update_stmt", "update_asgn_list", YY_NULLPTR
+  "create_database_stmt", "create_table_stmt", "create_table_name",
+  "create_col_list", "create_definition", "data_type", "column_atts",
+  "insert_stmt", "insert_table_name", "opt_col_names", "column_list",
+  "insert_vals_list", "insert_vals", "select_stmt", "select_table_name",
+  "select_expr_list", "opt_where", "expr", "delete_stmt",
+  "delete_table_name", "update_stmt", "update_table_name",
+  "update_asgn_list", YY_NULLPTR
 };
 #endif
 
@@ -542,10 +555,10 @@ static const yytype_uint16 yytoknum[] =
 };
 # endif
 
-#define YYPACT_NINF -33
+#define YYPACT_NINF -37
 
 #define yypact_value_is_default(Yystate) \
-  (!!((Yystate) == (-33)))
+  (!!((Yystate) == (-37)))
 
 #define YYTABLE_NINF -1
 
@@ -556,18 +569,18 @@ static const yytype_uint16 yytoknum[] =
      STATE-NUM.  */
 static const yytype_int8 yypact[] =
 {
-     -33,    21,   -33,    50,    -5,     1,    -4,    -2,   -33,    24,
-     -33,   -33,   -33,   -33,   -33,   -33,    33,    51,    52,    58,
-     -33,   -33,     0,   -33,    41,    53,   -33,    54,    55,    65,
-      -2,    63,    22,    66,   -33,    -8,    67,    62,    22,   -33,
-      25,   -33,   -33,   -33,   -33,     4,    31,   -33,    59,   -33,
-     -33,   -33,    26,    60,    19,   -33,   -33,   -33,    38,    64,
-       9,   -33,    22,    22,    22,    22,    22,    22,    68,   -33,
-      70,    61,    71,   -33,    73,   -33,    75,    34,    69,    22,
-      13,    13,    72,    72,    72,     9,    74,    76,    92,   -33,
-     -33,    90,   -33,   -33,    77,   -33,   -33,   -33,    43,     9,
-      78,     9,    22,   -33,   -33,   -33,    79,   -33,    40,    34,
-       9,    80,   -33,     9,    45,   -33,   -33
+     -37,     1,   -37,    48,     5,    14,     6,    -2,   -37,    20,
+     -37,   -37,    33,   -37,    34,   -37,   -37,    60,   -37,    50,
+      56,    57,    58,    59,   -37,   -37,   -12,   -37,    51,    38,
+      61,    63,     2,   -37,     2,   -37,   -37,   -37,   -37,    64,
+      65,   -37,    53,   -37,   -37,   -37,    42,    62,   -23,   -37,
+     -37,   -37,    21,    66,   -37,   -37,   -37,     0,    11,   -13,
+     -37,    60,   -37,    67,    44,    68,   -37,    70,   -37,    71,
+      49,    54,     2,     2,     2,     2,     2,     2,     2,    73,
+     -37,   -37,    69,    83,   -37,   -37,    86,   -37,   -37,    72,
+     -37,   -37,   -37,    24,     0,    75,     3,     3,    74,    74,
+      74,     0,     0,    76,   -37,   -37,   -37,    77,   -37,    52,
+      49,     2,    78,   -37,     0,    28,     0,   -37,   -37
 };
 
   /* YYDEFACT[STATE-NUM] -- Default reduction number in state STATE-NUM.
@@ -576,33 +589,33 @@ static const yytype_int8 yypact[] =
 static const yytype_uint8 yydefact[] =
 {
        4,     0,     1,     0,     0,     0,     0,     0,     3,     0,
-       8,     9,     7,     5,     6,    10,     0,     0,     0,     0,
-      42,    40,     0,    43,     0,     0,    11,     0,    29,    45,
-       0,     0,     0,     0,     2,     0,     0,     0,     0,    56,
-      45,    41,    47,    48,    49,     0,    45,    44,     0,    18,
-      19,    20,     0,     0,     0,    14,    13,    31,     0,     0,
-      46,    39,     0,     0,     0,     0,     0,     0,     0,    57,
-       0,    22,     0,    12,     0,    30,     0,     0,    28,     0,
-      51,    52,    53,    54,    55,    58,     0,     0,     0,    24,
-      25,     0,    26,    16,     0,    15,    32,    36,     0,    35,
-       0,    50,     0,    17,    23,    27,     0,    33,     0,     0,
-      59,     0,    38,    37,     0,    21,    34
+       8,     9,     0,     7,    31,     5,     6,    46,    10,     0,
+       0,     0,     0,     0,    45,    43,     0,    60,     0,     0,
+       0,     0,     0,    57,     0,    11,    13,    30,    58,     0,
+       0,     2,     0,    19,    20,    21,     0,     0,     0,    15,
+      14,    33,     0,     0,    48,    49,    50,    47,     0,    46,
+      42,    46,    44,     0,    23,     0,    12,     0,    32,     0,
+       0,    29,     0,     0,     0,     0,     0,     0,     0,     0,
+      59,    41,     0,     0,    25,    26,     0,    27,    17,     0,
+      16,    34,    38,     0,    37,     0,    52,    53,    54,    55,
+      56,    51,    61,     0,    18,    24,    28,     0,    35,     0,
+       0,     0,     0,    40,    39,     0,    62,    22,    36
 };
 
   /* YYPGOTO[NTERM-NUM].  */
 static const yytype_int8 yypgoto[] =
 {
-     -33,   -33,   -33,   -33,   -33,   -33,    39,    81,   -33,   -33,
-     -33,   -33,   -33,     5,   -33,   -33,    85,   -18,   -32,   -33,
-     -33,   -33
+     -37,   -37,   -37,   -37,   -37,   -37,   -37,    39,    79,   -37,
+     -37,   -37,   -37,   -37,   -37,     4,   -37,   -37,   -37,   -36,
+     -32,   -37,   -37,   -37,   -37,   -37
 };
 
   /* YYDEFGOTO[NTERM-NUM].  */
 static const yytype_int8 yydefgoto[] =
 {
-      -1,     1,     9,    10,    11,    54,    55,    56,    93,    12,
-      37,    58,    78,    98,    13,    22,    24,    39,    99,    14,
-      15,    46
+      -1,     1,     9,    10,    11,    12,    48,    49,    50,    88,
+      13,    14,    31,    52,    71,    93,    15,    61,    26,    33,
+      94,    16,    17,    18,    19,    59
 };
 
   /* YYTABLE[YYPACT[STATE-NUM]] -- What to do in state STATE-NUM.  If
@@ -610,38 +623,36 @@ static const yytype_int8 yydefgoto[] =
      number is the opposite.  If YYTABLE_NINF, syntax error.  */
 static const yytype_uint8 yytable[] =
 {
-      45,    20,    48,    49,    50,    51,    60,    62,    63,    64,
-      65,    66,    62,    63,    64,    65,    66,    18,    64,    65,
-      66,     2,    61,    52,    30,    19,    53,    21,    69,    23,
-      80,    81,    82,    83,    84,    85,    48,    49,    50,    51,
-      67,     3,     4,    31,     5,    79,     6,   101,     7,    79,
-      97,    38,     8,    42,    43,    44,   112,    38,    16,    17,
-      53,    73,    74,    25,    26,    42,    43,    44,    33,    32,
-     110,    42,    43,    44,    68,    88,   113,    89,    90,    91,
-      75,    76,    27,    28,    33,   107,   108,   116,   108,    29,
-      92,    38,    59,    34,    41,    35,    36,    47,    57,    86,
-      70,    72,    87,    94,    52,    77,    96,   104,    79,   105,
-     102,   111,   100,    95,   114,    40,     0,     0,   103,   109,
-     106,     0,   115,     0,     0,     0,     0,     0,     0,     0,
-       0,     0,     0,    71
+      57,     2,    58,    72,    73,    74,    75,    76,    74,    75,
+      76,    24,    39,    32,    72,    73,    74,    75,    76,    66,
+      67,     3,     4,    80,     5,    81,     6,    22,     7,    27,
+      79,    40,     8,    54,    55,    56,    77,    25,    23,    77,
+      96,    97,    98,    99,   100,   101,   102,    78,    42,    43,
+      44,    45,    42,    43,    44,    45,    20,    21,    83,    28,
+      84,    85,    86,    68,    69,    92,   108,   109,   113,    46,
+     118,   109,    47,    87,    29,    30,    47,   114,    34,   116,
+      54,    55,    56,    54,    55,    56,    32,    35,    36,    37,
+      38,    41,    51,    53,    63,    60,    62,    95,   105,    82,
+      89,    46,    91,    65,   103,   106,    90,    70,     0,   112,
+      77,   104,   111,     0,   115,   107,   110,     0,     0,     0,
+     117,     0,     0,     0,     0,    64
 };
 
 static const yytype_int8 yycheck[] =
 {
-      32,     5,    10,    11,    12,    13,    38,     3,     4,     5,
-       6,     7,     3,     4,     5,     6,     7,    22,     5,     6,
-       7,     0,    40,    31,    24,    24,    34,    31,    46,    31,
-      62,    63,    64,    65,    66,    67,    10,    11,    12,    13,
-      36,    20,    21,    43,    23,    36,    25,    79,    27,    36,
-      16,    26,    31,    31,    32,    33,    16,    26,     8,     9,
-      34,    42,    43,    39,    31,    31,    32,    33,    43,    28,
-     102,    31,    32,    33,    43,    14,   108,    16,    17,    18,
-      42,    43,    31,    31,    43,    42,    43,    42,    43,    31,
-      29,    26,    30,    40,    31,    41,    41,    31,    31,    31,
-      41,    41,    32,    32,    31,    41,    31,    15,    36,    19,
-      36,    32,    43,    74,   109,    30,    -1,    -1,    42,    41,
-      43,    -1,    42,    -1,    -1,    -1,    -1,    -1,    -1,    -1,
-      -1,    -1,    -1,    52
+      32,     0,    34,     3,     4,     5,     6,     7,     5,     6,
+       7,     5,    24,    26,     3,     4,     5,     6,     7,    42,
+      43,    20,    21,    59,    23,    61,    25,    22,    27,    31,
+      43,    43,    31,    31,    32,    33,    36,    31,    24,    36,
+      72,    73,    74,    75,    76,    77,    78,    36,    10,    11,
+      12,    13,    10,    11,    12,    13,     8,     9,    14,    39,
+      16,    17,    18,    42,    43,    16,    42,    43,    16,    31,
+      42,    43,    34,    29,    41,    41,    34,   109,    28,   111,
+      31,    32,    33,    31,    32,    33,    26,    31,    31,    31,
+      31,    40,    31,    30,    41,    31,    31,    43,    15,    32,
+      32,    31,    31,    41,    31,    19,    67,    41,    -1,    32,
+      36,    42,    36,    -1,   110,    43,    41,    -1,    -1,    -1,
+      42,    -1,    -1,    -1,    -1,    46
 };
 
   /* YYSTOS[STATE-NUM] -- The (internal number of the) accessing
@@ -649,39 +660,41 @@ static const yytype_int8 yycheck[] =
 static const yytype_uint8 yystos[] =
 {
        0,    45,     0,    20,    21,    23,    25,    27,    31,    46,
-      47,    48,    53,    58,    63,    64,     8,     9,    22,    24,
-       5,    31,    59,    31,    60,    39,    31,    31,    31,    31,
-      24,    43,    28,    43,    40,    41,    41,    54,    26,    61,
-      60,    31,    31,    32,    33,    62,    65,    31,    10,    11,
-      12,    13,    31,    34,    49,    50,    51,    31,    55,    30,
-      62,    61,     3,     4,     5,     6,     7,    36,    43,    61,
-      41,    51,    41,    42,    43,    42,    43,    41,    56,    36,
-      62,    62,    62,    62,    62,    62,    31,    32,    14,    16,
-      17,    18,    29,    52,    32,    50,    31,    16,    57,    62,
-      43,    62,    36,    42,    15,    19,    43,    42,    43,    41,
-      62,    32,    16,    62,    57,    42,    42
+      47,    48,    49,    54,    55,    60,    65,    66,    67,    68,
+       8,     9,    22,    24,     5,    31,    62,    31,    39,    41,
+      41,    56,    26,    63,    28,    31,    31,    31,    31,    24,
+      43,    40,    10,    11,    12,    13,    31,    34,    50,    51,
+      52,    31,    57,    30,    31,    32,    33,    64,    64,    69,
+      31,    61,    31,    41,    52,    41,    42,    43,    42,    43,
+      41,    58,     3,     4,     5,     6,     7,    36,    36,    43,
+      63,    63,    32,    14,    16,    17,    18,    29,    53,    32,
+      51,    31,    16,    59,    64,    43,    64,    64,    64,    64,
+      64,    64,    64,    31,    42,    15,    19,    43,    42,    43,
+      41,    36,    32,    16,    64,    59,    64,    42,    42
 };
 
   /* YYR1[YYN] -- Symbol number of symbol that rule YYN derives.  */
 static const yytype_uint8 yyr1[] =
 {
        0,    44,    45,    45,    45,    46,    46,    46,    46,    46,
-      46,    47,    48,    49,    49,    49,    50,    51,    51,    51,
-      51,    51,    52,    52,    52,    52,    52,    52,    53,    54,
-      54,    55,    55,    56,    56,    57,    57,    57,    57,    58,
-      59,    59,    59,    60,    60,    61,    61,    62,    62,    62,
-      62,    62,    62,    62,    62,    62,    63,    64,    65,    65
+      46,    47,    48,    49,    50,    50,    50,    51,    52,    52,
+      52,    52,    52,    53,    53,    53,    53,    53,    53,    54,
+      55,    56,    56,    57,    57,    58,    58,    59,    59,    59,
+      59,    60,    61,    62,    62,    62,    63,    63,    64,    64,
+      64,    64,    64,    64,    64,    64,    64,    65,    66,    67,
+      68,    69,    69
 };
 
   /* YYR2[YYN] -- Number of symbols on the right hand side of rule YYN.  */
 static const yytype_uint8 yyr2[] =
 {
        0,     2,     4,     2,     0,     1,     1,     1,     1,     1,
-       1,     3,     6,     1,     1,     3,     3,     4,     1,     1,
-       1,     6,     0,     2,     1,     1,     1,     2,     6,     0,
-       3,     1,     3,     3,     5,     1,     1,     3,     3,     5,
-       1,     3,     1,     1,     3,     0,     2,     1,     1,     1,
-       3,     3,     3,     3,     3,     3,     4,     5,     3,     5
+       1,     3,     4,     3,     1,     1,     3,     3,     4,     1,
+       1,     1,     6,     0,     2,     1,     1,     1,     2,     4,
+       3,     0,     3,     1,     3,     3,     5,     1,     1,     3,
+       3,     5,     1,     1,     3,     1,     0,     2,     1,     1,
+       1,     3,     3,     3,     3,     3,     3,     2,     3,     4,
+       2,     3,     5
 };
 
 
@@ -1358,39 +1371,53 @@ yyreduce:
   switch (yyn)
     {
         case 2:
-#line 91 "sqlparse.ypp" /* yacc.c:1646  */
+#line 101 "sqlparse.ypp" /* yacc.c:1646  */
     {
     printf("\n");
     printf("\n");
 }
-#line 1367 "sqlparse.tab.cpp" /* yacc.c:1646  */
+#line 1380 "sqlparse.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 3:
-#line 95 "sqlparse.ypp" /* yacc.c:1646  */
+#line 105 "sqlparse.ypp" /* yacc.c:1646  */
     {
     if(temp=="exit")
+    {
         flag=1;
+        flag_exit=1;
+    }
 }
-#line 1376 "sqlparse.tab.cpp" /* yacc.c:1646  */
+#line 1392 "sqlparse.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 12:
-#line 113 "sqlparse.ypp" /* yacc.c:1646  */
+#line 126 "sqlparse.ypp" /* yacc.c:1646  */
     {
     if(!flag_kv){
         printf("error:there is no primary key\n");
         val_num=0;
         valp=-1;
         colp=-1;
+        tt[tablenum].valp=-1;
+        tt[tablenum].colp=-1;
     }
     //tablenum++;
 }
-#line 1390 "sqlparse.tab.cpp" /* yacc.c:1646  */
+#line 1408 "sqlparse.tab.cpp" /* yacc.c:1646  */
     break;
 
-  case 16:
-#line 129 "sqlparse.ypp" /* yacc.c:1646  */
+  case 13:
+#line 139 "sqlparse.ypp" /* yacc.c:1646  */
+    {
+    tablename=temp;
+    //flag_col=!flag_col;
+}
+#line 1417 "sqlparse.tab.cpp" /* yacc.c:1646  */
+    break;
+
+  case 17:
+#line 149 "sqlparse.ypp" /* yacc.c:1646  */
     {
     colp++;
     //cout<<colp<<temp<<datatype<<dataattr<<endl;
@@ -1399,94 +1426,145 @@ yyreduce:
     tt[tablenum].insert_col(temp,datatype,dataattr,colp);
     dataattr=0;//完整性约束若不置0，会被之前度属性值度完整性约束覆盖
 }
-#line 1403 "sqlparse.tab.cpp" /* yacc.c:1646  */
-    break;
-
-  case 17:
-#line 139 "sqlparse.ypp" /* yacc.c:1646  */
-    {
-    datatype=1;
-}
-#line 1411 "sqlparse.tab.cpp" /* yacc.c:1646  */
+#line 1430 "sqlparse.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 18:
-#line 142 "sqlparse.ypp" /* yacc.c:1646  */
+#line 159 "sqlparse.ypp" /* yacc.c:1646  */
     {
-    datatype=2;
+    datatype=1;
 }
-#line 1419 "sqlparse.tab.cpp" /* yacc.c:1646  */
+#line 1438 "sqlparse.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 19:
-#line 145 "sqlparse.ypp" /* yacc.c:1646  */
+#line 162 "sqlparse.ypp" /* yacc.c:1646  */
     {
-    datatype=3;
+    datatype=2;
 }
-#line 1427 "sqlparse.tab.cpp" /* yacc.c:1646  */
+#line 1446 "sqlparse.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 20:
-#line 148 "sqlparse.ypp" /* yacc.c:1646  */
+#line 165 "sqlparse.ypp" /* yacc.c:1646  */
+    {
+    datatype=3;
+}
+#line 1454 "sqlparse.tab.cpp" /* yacc.c:1646  */
+    break;
+
+  case 21:
+#line 168 "sqlparse.ypp" /* yacc.c:1646  */
     {
     datatype=4;
 }
-#line 1435 "sqlparse.tab.cpp" /* yacc.c:1646  */
-    break;
-
-  case 23:
-#line 154 "sqlparse.ypp" /* yacc.c:1646  */
-    {
-    dataattr=1;
-}
-#line 1443 "sqlparse.tab.cpp" /* yacc.c:1646  */
+#line 1462 "sqlparse.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 24:
-#line 157 "sqlparse.ypp" /* yacc.c:1646  */
+#line 174 "sqlparse.ypp" /* yacc.c:1646  */
     {
-    dataattr=2;
+    dataattr=1;
 }
-#line 1451 "sqlparse.tab.cpp" /* yacc.c:1646  */
+#line 1470 "sqlparse.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 25:
-#line 160 "sqlparse.ypp" /* yacc.c:1646  */
+#line 177 "sqlparse.ypp" /* yacc.c:1646  */
     {
-    dataattr=3;
+    dataattr=2;
 }
-#line 1459 "sqlparse.tab.cpp" /* yacc.c:1646  */
+#line 1478 "sqlparse.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 26:
-#line 163 "sqlparse.ypp" /* yacc.c:1646  */
+#line 180 "sqlparse.ypp" /* yacc.c:1646  */
     {
-    dataattr=4;
+    dataattr=3;
 }
-#line 1467 "sqlparse.tab.cpp" /* yacc.c:1646  */
+#line 1486 "sqlparse.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 27:
-#line 166 "sqlparse.ypp" /* yacc.c:1646  */
+#line 183 "sqlparse.ypp" /* yacc.c:1646  */
+    {
+    dataattr=4;
+}
+#line 1494 "sqlparse.tab.cpp" /* yacc.c:1646  */
+    break;
+
+  case 28:
+#line 186 "sqlparse.ypp" /* yacc.c:1646  */
     {
     dataattr=5;
 }
-#line 1475 "sqlparse.tab.cpp" /* yacc.c:1646  */
+#line 1502 "sqlparse.tab.cpp" /* yacc.c:1646  */
     break;
 
-  case 33:
-#line 182 "sqlparse.ypp" /* yacc.c:1646  */
+  case 29:
+#line 193 "sqlparse.ypp" /* yacc.c:1646  */
     {
-    valp=-1;
+    if(val_num_count_flag==0)
+    {
+        val_num_count=0;
+    }
+    val_num=val_num-val_num_count;
+    //cout<<val_num_count<<endl;
+    tt[tablenum].valp=tt[tablenum].valp-val_num_count;
 }
-#line 1483 "sqlparse.tab.cpp" /* yacc.c:1646  */
+#line 1516 "sqlparse.tab.cpp" /* yacc.c:1646  */
+    break;
+
+  case 30:
+#line 204 "sqlparse.ypp" /* yacc.c:1646  */
+    {
+    if(tablename!=temp)
+    {
+        cout<<"there is not a table named: "<<temp<<endl;
+        val_num_count_flag=1;
+    }
+    else{
+        val_num_count_flag=0;
+    }
+    //flag_col=!flag_col;
+}
+#line 1532 "sqlparse.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 35:
-#line 188 "sqlparse.ypp" /* yacc.c:1646  */
+#line 223 "sqlparse.ypp" /* yacc.c:1646  */
+    {
+    valp=-1;
+    if(ifgoback==1)
+    {
+        val_num--;
+        tt[tablenum].valp--;    
+    }
+    ifgoback=0;
+}
+#line 1546 "sqlparse.tab.cpp" /* yacc.c:1646  */
+    break;
+
+  case 36:
+#line 233 "sqlparse.ypp" /* yacc.c:1646  */
+    {
+    valp=-1;
+    if(ifgoback==1)
+    {
+        val_num--;
+        tt[tablenum].valp--;    
+    }
+    ifgoback=0;
+}
+#line 1560 "sqlparse.tab.cpp" /* yacc.c:1646  */
+    break;
+
+  case 37:
+#line 244 "sqlparse.ypp" /* yacc.c:1646  */
     {
     valp++;
     val_num++;
+    val_num_count++;
     if(tt[tablenum].datatype[valp]==1)
     {
         if(temp.at(0)==39)
@@ -1498,33 +1576,31 @@ yyreduce:
         else{
             cout<<"Input error:the varchar type value should be included by''."<<endl;
             ifinsert=0;
-            valp--;
-            val_num--;
+            ifgoback=1;
         }
     }
-    if(tt[tablenum].datatype[valp]==2)
+    else if(tt[tablenum].datatype[valp]==2)
     {
         if(flag_ifint!=1)
         {
             cout<<"Input error:the int type value should be formed by [0-9]*."<<endl;
             ifinsert=0;
-            valp--;
-            val_num--;
+            ifgoback=1;
         }
         else{
+            //cout<<"good"<<val_num<<"  "<<valp<<endl;
             tt[tablenum].insert_val(tempnum,val_num,valp);
             //flag_ifdou=0;
             flag_ifint=0;
         }
     }
-    if(tt[tablenum].datatype[valp]==3)
+    else if(tt[tablenum].datatype[valp]==3)
     {
         if(flag_ifdou!=1)
         {
             cout<<"Input error:the double type value should be formed by [0-9]*.[0-9]*."<<endl;
             ifinsert=0;
-            valp--;
-            val_num--;
+            ifgoback=1;
         }
         else{
             tt[tablenum].insert_val(tempdou,val_num,valp);
@@ -1533,13 +1609,13 @@ yyreduce:
         }
     }
     //cout<<val_num<<valp<<temp<<endl;
-    flag_col=!flag_col;
+    flag_col=true;
 }
-#line 1539 "sqlparse.tab.cpp" /* yacc.c:1646  */
+#line 1615 "sqlparse.tab.cpp" /* yacc.c:1646  */
     break;
 
-  case 37:
-#line 240 "sqlparse.ypp" /* yacc.c:1646  */
+  case 39:
+#line 295 "sqlparse.ypp" /* yacc.c:1646  */
     {
     valp++;
     //cout<<valp<<temp<<endl;
@@ -1554,18 +1630,16 @@ yyreduce:
         else{
             cout<<"Input error:the varchar type value should be included by''."<<endl;
             ifinsert=0;
-            valp--;
-            val_num--;
+            ifgoback=1;
         }
     }
-    if(tt[tablenum].datatype[valp]==2)
+    else if(tt[tablenum].datatype[valp]==2)
     {
         if(flag_ifint!=1)
         {
             cout<<"Input error:the int type value should be formed by [0-9]*."<<endl;
             ifinsert=0;
-            valp--;
-            val_num--;
+            ifgoback=1;
         }
         else{
             tt[tablenum].insert_val(tempnum,val_num,valp);
@@ -1573,14 +1647,13 @@ yyreduce:
             flag_ifint=0;
         }
     }
-    if(tt[tablenum].datatype[valp]==3)
+    else if(tt[tablenum].datatype[valp]==3)
     {
         if(flag_ifdou!=1)
         {
             cout<<"Input error:the double type value should be formed by [0-9]*.[0-9]*."<<endl;
             ifinsert=0;
-            valp--;
-            val_num--;
+            ifgoback=1;
         }
         else{
             tt[tablenum].insert_val(tempdou,val_num,valp);
@@ -1588,73 +1661,85 @@ yyreduce:
             //flag_ifint=0;
         }
     }
-    flag_col=!flag_col;
+    flag_col=true;
 }
-#line 1594 "sqlparse.tab.cpp" /* yacc.c:1646  */
-    break;
-
-  case 39:
-#line 294 "sqlparse.ypp" /* yacc.c:1646  */
-    {
-    tt[tablenum].select_table(flag_sel,flag_sel_val);
-    tt[tablenum].disp_table();
-    tt[tablenum].init_select_col();
-    tt[tablenum].init_select_val();
-    flag_sel=0;
-    flag_sel_val=0;
-}
-#line 1607 "sqlparse.tab.cpp" /* yacc.c:1646  */
-    break;
-
-  case 40:
-#line 304 "sqlparse.ypp" /* yacc.c:1646  */
-    {
-    tt[tablenum].select_col(temp);
-}
-#line 1615 "sqlparse.tab.cpp" /* yacc.c:1646  */
+#line 1667 "sqlparse.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 41:
-#line 308 "sqlparse.ypp" /* yacc.c:1646  */
+#line 346 "sqlparse.ypp" /* yacc.c:1646  */
     {
-    tt[tablenum].select_col(temp);
+    if(flag_select_table==1)
+    {
+        tt[tablenum].select_table(flag_sel,flag_sel_val);
+        tt[tablenum].disp_table();
+        tt[tablenum].init_select_col();
+        tt[tablenum].init_select_val();
+        flag_sel=0;
+        flag_sel_val=0;
+    }
+    flag_select_table=0;
 }
-#line 1623 "sqlparse.tab.cpp" /* yacc.c:1646  */
+#line 1684 "sqlparse.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 42:
-#line 311 "sqlparse.ypp" /* yacc.c:1646  */
+#line 359 "sqlparse.ypp" /* yacc.c:1646  */
     {
-    flag_sel=1;    
+    if(tablename!=temp)
+    {
+        cout<<"there is not a table named: "<<temp<<endl;
+    }
+    else{
+        flag_select_table=1;
+    }
+    //flag_col=!flag_col;
 }
-#line 1631 "sqlparse.tab.cpp" /* yacc.c:1646  */
+#line 1699 "sqlparse.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 43:
-#line 316 "sqlparse.ypp" /* yacc.c:1646  */
+#line 371 "sqlparse.ypp" /* yacc.c:1646  */
     {
+    tt[tablenum].select_col(temp);
 }
-#line 1638 "sqlparse.tab.cpp" /* yacc.c:1646  */
+#line 1707 "sqlparse.tab.cpp" /* yacc.c:1646  */
+    break;
+
+  case 44:
+#line 375 "sqlparse.ypp" /* yacc.c:1646  */
+    {
+    tt[tablenum].select_col(temp);
+}
+#line 1715 "sqlparse.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 45:
-#line 321 "sqlparse.ypp" /* yacc.c:1646  */
+#line 378 "sqlparse.ypp" /* yacc.c:1646  */
     {
-    flag_sel_val=1;
+    flag_sel=1;    
 }
-#line 1646 "sqlparse.tab.cpp" /* yacc.c:1646  */
+#line 1723 "sqlparse.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 46:
-#line 324 "sqlparse.ypp" /* yacc.c:1646  */
+#line 383 "sqlparse.ypp" /* yacc.c:1646  */
     {
-    flag_sel_val=0;
+    flag_sel_val=1;
 }
-#line 1654 "sqlparse.tab.cpp" /* yacc.c:1646  */
+#line 1731 "sqlparse.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 47:
-#line 330 "sqlparse.ypp" /* yacc.c:1646  */
+#line 386 "sqlparse.ypp" /* yacc.c:1646  */
+    {
+    flag_sel_val=0;
+}
+#line 1739 "sqlparse.tab.cpp" /* yacc.c:1646  */
+    break;
+
+  case 48:
+#line 392 "sqlparse.ypp" /* yacc.c:1646  */
     {
     if(flag_col)//$$=temp;
     {
@@ -1666,11 +1751,11 @@ yyreduce:
         flag_col=!flag_col;
     }
 }
-#line 1670 "sqlparse.tab.cpp" /* yacc.c:1646  */
+#line 1755 "sqlparse.tab.cpp" /* yacc.c:1646  */
     break;
 
-  case 48:
-#line 341 "sqlparse.ypp" /* yacc.c:1646  */
+  case 49:
+#line 403 "sqlparse.ypp" /* yacc.c:1646  */
     {
     temp2=tempnum;
     if(!flag_col)
@@ -1680,11 +1765,11 @@ yyreduce:
     }
     datatype=2;
 }
-#line 1684 "sqlparse.tab.cpp" /* yacc.c:1646  */
+#line 1769 "sqlparse.tab.cpp" /* yacc.c:1646  */
     break;
 
-  case 49:
-#line 350 "sqlparse.ypp" /* yacc.c:1646  */
+  case 50:
+#line 412 "sqlparse.ypp" /* yacc.c:1646  */
     {
     temp2=tempdou;
     if(!flag_col)
@@ -1694,11 +1779,11 @@ yyreduce:
     }
     datatype=3;
 }
-#line 1698 "sqlparse.tab.cpp" /* yacc.c:1646  */
+#line 1783 "sqlparse.tab.cpp" /* yacc.c:1646  */
     break;
 
-  case 50:
-#line 359 "sqlparse.ypp" /* yacc.c:1646  */
+  case 51:
+#line 421 "sqlparse.ypp" /* yacc.c:1646  */
     {
     //cout<<temp1<<temp2<<flag_comp<<endl;
     col_search=tt[tablenum].ifexist_col(temp1);//找到要搜索哪一列
@@ -1739,33 +1824,72 @@ yyreduce:
         cout<<"the is no attribute named:"<<temp1<<endl;
     }
 }
-#line 1743 "sqlparse.tab.cpp" /* yacc.c:1646  */
-    break;
-
-  case 56:
-#line 406 "sqlparse.ypp" /* yacc.c:1646  */
-    {
-    val_num=val_num-tt[tablenum].delete_v;
-    tt[tablenum].delete_val_table();
-    tt[tablenum].delete_v=0;
-    tt[tablenum].init_select_col();
-    tt[tablenum].init_select_val();
-}
-#line 1755 "sqlparse.tab.cpp" /* yacc.c:1646  */
+#line 1828 "sqlparse.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 57:
-#line 416 "sqlparse.ypp" /* yacc.c:1646  */
+#line 468 "sqlparse.ypp" /* yacc.c:1646  */
     {
-    tt[tablenum].select_table(flag_sel,flag_sel_val);
-    tt[tablenum].updata_val_table(updatetemp);
-    tt[tablenum].init_select_val();
+    if(flag_delete_table==1)
+    {
+        tt[tablenum].delete_val_table();
+        val_num=val_num-tt[tablenum].delete_v;
+        tt[tablenum].delete_v=0;
+        tt[tablenum].init_select_col();
+        tt[tablenum].init_select_val();
+    }
+    flag_delete_table=0;
 }
-#line 1765 "sqlparse.tab.cpp" /* yacc.c:1646  */
+#line 1844 "sqlparse.tab.cpp" /* yacc.c:1646  */
     break;
 
   case 58:
-#line 423 "sqlparse.ypp" /* yacc.c:1646  */
+#line 480 "sqlparse.ypp" /* yacc.c:1646  */
+    {
+    if(tablename.compare(temp))
+    {
+        cout<<"there is not a table named: "<<temp<<endl;
+    }
+    else{
+        flag_delete_table=1;
+    }
+    //flag_col=!flag_col;
+}
+#line 1859 "sqlparse.tab.cpp" /* yacc.c:1646  */
+    break;
+
+  case 59:
+#line 493 "sqlparse.ypp" /* yacc.c:1646  */
+    {
+    if(flag_update_table)
+    {
+        tt[tablenum].select_table(flag_sel,flag_sel_val);
+        tt[tablenum].updata_val_table(updatetemp);
+        tt[tablenum].init_select_val();
+    }
+    flag_update_table=0;
+}
+#line 1873 "sqlparse.tab.cpp" /* yacc.c:1646  */
+    break;
+
+  case 60:
+#line 504 "sqlparse.ypp" /* yacc.c:1646  */
+    {
+    if(tablename.compare(temp))
+    {
+        cout<<"there is not a table named: "<<temp<<endl;
+    }
+    else
+    {
+        flag_update_table=1;
+    }
+    //flag_col=!flag_col;
+}
+#line 1889 "sqlparse.tab.cpp" /* yacc.c:1646  */
+    break;
+
+  case 61:
+#line 517 "sqlparse.ypp" /* yacc.c:1646  */
     {
     if(flag_comp!=1)
     {
@@ -1800,11 +1924,11 @@ yyreduce:
         }
     }
 }
-#line 1804 "sqlparse.tab.cpp" /* yacc.c:1646  */
+#line 1928 "sqlparse.tab.cpp" /* yacc.c:1646  */
     break;
 
 
-#line 1808 "sqlparse.tab.cpp" /* yacc.c:1646  */
+#line 1932 "sqlparse.tab.cpp" /* yacc.c:1646  */
       default: break;
     }
   /* User semantic actions sometimes alter yychar, and that requires
@@ -2032,44 +2156,47 @@ yyreturn:
 #endif
   return yyresult;
 }
-#line 460 "sqlparse.ypp" /* yacc.c:1906  */
+#line 554 "sqlparse.ypp" /* yacc.c:1906  */
 
 #include "scanner.cpp"
 int main()
 {
     tt[tablenum].init_table();
-    // colp=3;
-    // val_num=4;
-    // tt[tablenum].insert_col("Dno",2,5,0);
-    // tt[tablenum].insert_col("Dname",1,1,1);
-    // tt[tablenum].insert_col("Dsex",1,1,2);
-    // tt[tablenum].insert_col("Dage",2,1,3);
-    // tt[tablenum].insert_val("0001",1,0);
-    // tt[tablenum].insert_val("HaoYiwei",1,1);
-    // tt[tablenum].insert_val("male",1,2);
-    // tt[tablenum].insert_val("36",1,3);
-    // tt[tablenum].insert_val("0002",2,0);
-    // tt[tablenum].insert_val("LuoXiao",2,1);
-    // tt[tablenum].insert_val("female",2,2);
-    // tt[tablenum].insert_val("18",2,3);
-    // tt[tablenum].insert_val("0003",3,0);
-    // tt[tablenum].insert_val("Liuwei",3,1);
-    // tt[tablenum].insert_val("male",3,2);
-    // tt[tablenum].insert_val("30",3,3);
-    // tt[tablenum].insert_val("0004",4,0);
-    // tt[tablenum].insert_val("DengYingchao",4,1);
-    // tt[tablenum].insert_val("female",4,2);
-    // tt[tablenum].insert_val("27",4,3);
+    colp=3;
+    val_num=4;
+    tablename="BB";
+    tt[tablenum].insert_col("Dno",2,5,0);
+    tt[tablenum].insert_col("Dname",1,1,1);
+    tt[tablenum].insert_col("Dsex",1,1,2);
+    tt[tablenum].insert_col("Dage",2,1,3);
+    tt[tablenum].insert_val("0001",1,0);
+    tt[tablenum].insert_val("HaoYiwei",1,1);
+    tt[tablenum].insert_val("male",1,2);
+    tt[tablenum].insert_val("36",1,3);
+    tt[tablenum].insert_val("0002",2,0);
+    tt[tablenum].insert_val("LuoXiao",2,1);
+    tt[tablenum].insert_val("female",2,2);
+    tt[tablenum].insert_val("18",2,3);
+    tt[tablenum].insert_val("0003",3,0);
+    tt[tablenum].insert_val("Liuwei",3,1);
+    tt[tablenum].insert_val("male",3,2);
+    tt[tablenum].insert_val("30",3,3);
+    tt[tablenum].insert_val("0004",4,0);
+    tt[tablenum].insert_val("DengYingchao",4,1);
+    tt[tablenum].insert_val("female",4,2);
+    tt[tablenum].insert_val("27",4,3);
 
-    yyparse();
-    if(flag){
-        printf("\n");
-        printf("see you soon\n");
+    while(flag_exit!=1)
+    {
+        yyparse();
+        if(flag){
+            printf("\n");
+            printf("see you soon\n");
+        }
+        else{
+            printf("syntax error\n");
+        }
     }
-    else{
-        printf("syntax error\n");
-    }
-    
     return 0;
 }
 void yyerror(char* s){}

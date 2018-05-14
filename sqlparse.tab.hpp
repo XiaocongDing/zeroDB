@@ -84,11 +84,11 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 44 "sqlparse.ypp" /* yacc.c:1909  */
+#line 54 "sqlparse.ypp" /* yacc.c:1909  */
 
     int intval;       
     double floatval;      
-    char* strval;  
+    char strval[16];  
     //int subtok; 
 
 #line 95 "sqlparse.tab.hpp" /* yacc.c:1909  */

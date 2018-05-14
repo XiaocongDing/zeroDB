@@ -39,7 +39,7 @@ class table{
         collen=0;
         showcol_p=0;
         showval_p=0;
-        delete_v=1000;
+        delete_v=0;
         update_c=50;
         for(int i=0;i<50;i++)
         {
@@ -70,12 +70,13 @@ class table{
         }
     }
     int delete_val(int valnum){
+        //cout<<valnum<<endl;
         if(valnum<=valp)
         {
             if(valnum==valp)
             {
                 valp--;
-                showval_c--;
+                //showval_c--;
             }
             else{
                 for(int i=valnum;i<valp;i++)
@@ -86,7 +87,7 @@ class table{
                     }
                 }
                 valp--;
-                showval_c--;
+                //showval_c--;
             }
             return 1;
         }
@@ -97,9 +98,14 @@ class table{
     int delete_val_table()
     {
         //cout<<showval[1]<<endl;
+        //cout<<showval_c<<" "<<showval[2]<<endl;
         for(int i=1;i<showval_c;i++)
         {
+            //cout<<showval[i]<<endl;
+            if(i>1)
+                showval[i]--;
             delete_val(showval[i]);
+            delete_v++;
         }
     }
     int insert_col(string val,int datatypes,int dataattrs,int loc)
@@ -390,6 +396,7 @@ class table{
         int f=0;
         for(int i=0;i<colp+1;i++)
         {
+            //cout<<tables[0][0]<<endl;
             if(tables[0][i]==t)
             {
                 f=i+1;

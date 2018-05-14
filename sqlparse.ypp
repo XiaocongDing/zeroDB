@@ -8,6 +8,7 @@ using namespace std;
 #include"tables.h"
 #define yydebug
 //#define YYSTYLE double
+//#define YYSTYLE char*
 extern void yyerror(char*);
 void yyerror(const char*);
 extern int yylex(void);
@@ -15,6 +16,10 @@ int flag_kv = 0;
 int flag = 0;
 int flag_sel=0;
 int flag_sel_val=0;
+int flag_exit=0;
+int flag_update_table=0;
+int flag_delete_table=0;
+int flag_select_table=0;
 
 int colp = -1;//属性指针,colp+1就是当前表属性个数
 int valp = -1;//元组指针,标注当前操作元素位置
@@ -27,9 +32,14 @@ int t=0;
 int col_search;
 int ifinsert=1;
 bool flag_col=true;
+int ifgoback=0;
+int val_num_count=0;
+int val_num_count_flag=0;
+
 string temp1;
 string temp2;
 string updatetemp;
+string tablename;
 extern int flag_ifint;
 extern string temp;
 extern string tempnum;
@@ -44,7 +54,7 @@ table tt[10];//最多可以建十个表
 %union {
     int intval;       
     double floatval;      
-    char* strval;  
+    char strval[16];  
     //int subtok; 
 }
 
@@ -94,7 +104,10 @@ start stmt ';' '\n'{
 }
 | start NAME{
     if(temp=="exit")
+    {
         flag=1;
+        flag_exit=1;
+    }
 }
 |
 ;
@@ -110,16 +123,23 @@ create_database_stmt:
 CREATE DATABASE NAME
 ;
 create_table_stmt:
-CREATE TABLE NAME '(' create_col_list ')'{
+create_table_name '(' create_col_list ')'{
     if(!flag_kv){
         printf("error:there is no primary key\n");
         val_num=0;
         valp=-1;
         colp=-1;
+        tt[tablenum].valp=-1;
+        tt[tablenum].colp=-1;
     }
     //tablenum++;
 }
 ;
+create_table_name:
+CREATE TABLE NAME{
+    tablename=temp;
+    //flag_col=!flag_col;
+};
 create_col_list:
 data_type
 | create_definition
@@ -169,8 +189,29 @@ column_atts:
 ; 
 
 insert_stmt:
-INSERT INTO NAME opt_col_names VALUES insert_vals_list
+insert_table_name opt_col_names VALUES insert_vals_list
+{
+    if(val_num_count_flag==0)
+    {
+        val_num_count=0;
+    }
+    val_num=val_num-val_num_count;
+    //cout<<val_num_count<<endl;
+    tt[tablenum].valp=tt[tablenum].valp-val_num_count;
+}
 ;
+insert_table_name:
+INSERT INTO NAME{
+    if(tablename!=temp)
+    {
+        cout<<"there is not a table named: "<<temp<<endl;
+        val_num_count_flag=1;
+    }
+    else{
+        val_num_count_flag=0;
+    }
+    //flag_col=!flag_col;
+};
 opt_col_names:
 | '(' column_list ')'
 ;
@@ -181,13 +222,29 @@ NAME
 insert_vals_list:
 '(' insert_vals ')'{
     valp=-1;
+    if(ifgoback==1)
+    {
+        val_num--;
+        tt[tablenum].valp--;    
+    }
+    ifgoback=0;
 }
 | insert_vals_list ',' '(' insert_vals ')'
+{
+    valp=-1;
+    if(ifgoback==1)
+    {
+        val_num--;
+        tt[tablenum].valp--;    
+    }
+    ifgoback=0;
+}
 ;
 insert_vals:
 expr{
     valp++;
     val_num++;
+    val_num_count++;
     if(tt[tablenum].datatype[valp]==1)
     {
         if(temp.at(0)==39)
@@ -199,33 +256,31 @@ expr{
         else{
             cout<<"Input error:the varchar type value should be included by''."<<endl;
             ifinsert=0;
-            valp--;
-            val_num--;
+            ifgoback=1;
         }
     }
-    if(tt[tablenum].datatype[valp]==2)
+    else if(tt[tablenum].datatype[valp]==2)
     {
         if(flag_ifint!=1)
         {
             cout<<"Input error:the int type value should be formed by [0-9]*."<<endl;
             ifinsert=0;
-            valp--;
-            val_num--;
+            ifgoback=1;
         }
         else{
+            //cout<<"good"<<val_num<<"  "<<valp<<endl;
             tt[tablenum].insert_val(tempnum,val_num,valp);
             //flag_ifdou=0;
             flag_ifint=0;
         }
     }
-    if(tt[tablenum].datatype[valp]==3)
+    else if(tt[tablenum].datatype[valp]==3)
     {
         if(flag_ifdou!=1)
         {
             cout<<"Input error:the double type value should be formed by [0-9]*.[0-9]*."<<endl;
             ifinsert=0;
-            valp--;
-            val_num--;
+            ifgoback=1;
         }
         else{
             tt[tablenum].insert_val(tempdou,val_num,valp);
@@ -234,7 +289,7 @@ expr{
         }
     }
     //cout<<val_num<<valp<<temp<<endl;
-    flag_col=!flag_col;
+    flag_col=true;
 }
 | DEFAULT
 | insert_vals ',' expr{
@@ -251,18 +306,16 @@ expr{
         else{
             cout<<"Input error:the varchar type value should be included by''."<<endl;
             ifinsert=0;
-            valp--;
-            val_num--;
+            ifgoback=1;
         }
     }
-    if(tt[tablenum].datatype[valp]==2)
+    else if(tt[tablenum].datatype[valp]==2)
     {
         if(flag_ifint!=1)
         {
             cout<<"Input error:the int type value should be formed by [0-9]*."<<endl;
             ifinsert=0;
-            valp--;
-            val_num--;
+            ifgoback=1;
         }
         else{
             tt[tablenum].insert_val(tempnum,val_num,valp);
@@ -270,14 +323,13 @@ expr{
             flag_ifint=0;
         }
     }
-    if(tt[tablenum].datatype[valp]==3)
+    else if(tt[tablenum].datatype[valp]==3)
     {
         if(flag_ifdou!=1)
         {
             cout<<"Input error:the double type value should be formed by [0-9]*.[0-9]*."<<endl;
             ifinsert=0;
-            valp--;
-            val_num--;
+            ifgoback=1;
         }
         else{
             tt[tablenum].insert_val(tempdou,val_num,valp);
@@ -285,19 +337,34 @@ expr{
             //flag_ifint=0;
         }
     }
-    flag_col=!flag_col;
+    flag_col=true;
 }
 | insert_vals ',' DEFAULT
 ;
 
 select_stmt:
-SELECT select_expr_list FROM table_references opt_where{
-    tt[tablenum].select_table(flag_sel,flag_sel_val);
-    tt[tablenum].disp_table();
-    tt[tablenum].init_select_col();
-    tt[tablenum].init_select_val();
-    flag_sel=0;
-    flag_sel_val=0;
+SELECT select_expr_list FROM select_table_name opt_where{
+    if(flag_select_table==1)
+    {
+        tt[tablenum].select_table(flag_sel,flag_sel_val);
+        tt[tablenum].disp_table();
+        tt[tablenum].init_select_col();
+        tt[tablenum].init_select_val();
+        flag_sel=0;
+        flag_sel_val=0;
+    }
+    flag_select_table=0;
+};
+select_table_name:
+NAME{
+    if(tablename!=temp)
+    {
+        cout<<"there is not a table named: "<<temp<<endl;
+    }
+    else{
+        flag_select_table=1;
+    }
+    //flag_col=!flag_col;
 }
 ;
 select_expr_list:
@@ -311,11 +378,6 @@ NAME{
 | '*'{
     flag_sel=1;    
 }
-;
-table_references:
-NAME{
-}
-| table_references ',' NAME
 ;
 opt_where:
 {
@@ -403,20 +465,52 @@ NAME
 | expr '%' expr
 ;
 delete_stmt:
-DELETE FROM NAME opt_where{
-    val_num=val_num-tt[tablenum].delete_v;
-    tt[tablenum].delete_val_table();
-    tt[tablenum].delete_v=0;
-    tt[tablenum].init_select_col();
-    tt[tablenum].init_select_val();
+delete_table_name opt_where{
+    if(flag_delete_table==1)
+    {
+        tt[tablenum].delete_val_table();
+        val_num=val_num-tt[tablenum].delete_v;
+        tt[tablenum].delete_v=0;
+        tt[tablenum].init_select_col();
+        tt[tablenum].init_select_val();
+    }
+    flag_delete_table=0;
+};
+delete_table_name:
+DELETE FROM NAME{
+    if(tablename.compare(temp))
+    {
+        cout<<"there is not a table named: "<<temp<<endl;
+    }
+    else{
+        flag_delete_table=1;
+    }
+    //flag_col=!flag_col;
 }
 ;
 update_stmt:
-UPDATE table_references SET update_asgn_list opt_where
+update_table_name SET update_asgn_list opt_where
 {
-    tt[tablenum].select_table(flag_sel,flag_sel_val);
-    tt[tablenum].updata_val_table(updatetemp);
-    tt[tablenum].init_select_val();
+    if(flag_update_table)
+    {
+        tt[tablenum].select_table(flag_sel,flag_sel_val);
+        tt[tablenum].updata_val_table(updatetemp);
+        tt[tablenum].init_select_val();
+    }
+    flag_update_table=0;
+}
+;
+update_table_name:
+UPDATE NAME{
+    if(tablename.compare(temp))
+    {
+        cout<<"there is not a table named: "<<temp<<endl;
+    }
+    else
+    {
+        flag_update_table=1;
+    }
+    //flag_col=!flag_col;
 }
 ;
 update_asgn_list:
@@ -462,38 +556,41 @@ expr COMPARISON expr{
 int main()
 {
     tt[tablenum].init_table();
-    // colp=3;
-    // val_num=4;
-    // tt[tablenum].insert_col("Dno",2,5,0);
-    // tt[tablenum].insert_col("Dname",1,1,1);
-    // tt[tablenum].insert_col("Dsex",1,1,2);
-    // tt[tablenum].insert_col("Dage",2,1,3);
-    // tt[tablenum].insert_val("0001",1,0);
-    // tt[tablenum].insert_val("HaoYiwei",1,1);
-    // tt[tablenum].insert_val("male",1,2);
-    // tt[tablenum].insert_val("36",1,3);
-    // tt[tablenum].insert_val("0002",2,0);
-    // tt[tablenum].insert_val("LuoXiao",2,1);
-    // tt[tablenum].insert_val("female",2,2);
-    // tt[tablenum].insert_val("18",2,3);
-    // tt[tablenum].insert_val("0003",3,0);
-    // tt[tablenum].insert_val("Liuwei",3,1);
-    // tt[tablenum].insert_val("male",3,2);
-    // tt[tablenum].insert_val("30",3,3);
-    // tt[tablenum].insert_val("0004",4,0);
-    // tt[tablenum].insert_val("DengYingchao",4,1);
-    // tt[tablenum].insert_val("female",4,2);
-    // tt[tablenum].insert_val("27",4,3);
+    colp=3;
+    val_num=4;
+    tablename="BB";
+    tt[tablenum].insert_col("Dno",2,5,0);
+    tt[tablenum].insert_col("Dname",1,1,1);
+    tt[tablenum].insert_col("Dsex",1,1,2);
+    tt[tablenum].insert_col("Dage",2,1,3);
+    tt[tablenum].insert_val("0001",1,0);
+    tt[tablenum].insert_val("HaoYiwei",1,1);
+    tt[tablenum].insert_val("male",1,2);
+    tt[tablenum].insert_val("36",1,3);
+    tt[tablenum].insert_val("0002",2,0);
+    tt[tablenum].insert_val("LuoXiao",2,1);
+    tt[tablenum].insert_val("female",2,2);
+    tt[tablenum].insert_val("18",2,3);
+    tt[tablenum].insert_val("0003",3,0);
+    tt[tablenum].insert_val("Liuwei",3,1);
+    tt[tablenum].insert_val("male",3,2);
+    tt[tablenum].insert_val("30",3,3);
+    tt[tablenum].insert_val("0004",4,0);
+    tt[tablenum].insert_val("DengYingchao",4,1);
+    tt[tablenum].insert_val("female",4,2);
+    tt[tablenum].insert_val("27",4,3);
 
-    yyparse();
-    if(flag){
-        printf("\n");
-        printf("see you soon\n");
+    while(flag_exit!=1)
+    {
+        yyparse();
+        if(flag){
+            printf("\n");
+            printf("see you soon\n");
+        }
+        else{
+            printf("syntax error\n");
+        }
     }
-    else{
-        printf("syntax error\n");
-    }
-    
     return 0;
 }
 void yyerror(char* s){}
