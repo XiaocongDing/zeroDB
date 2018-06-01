@@ -1,9 +1,8 @@
-BB##6##4##
+BB##5##4##  //tablename,valp,colp
 2##1##1##2##  //datatype
-5##1##1##1##  //dataattr
+5##1##1##1##  //dataattr 
 Dno##Dname##Dsex##Dage##
 0001##HaoYiwei##male##36##
 0002##LuoXiao##female##18##
 0003##Liuwei##male##30##
 0004##DengYingchao##female##27##
-0005##PengYunqi##male##19##

@@ -376,8 +376,8 @@ static void yy_fatal_error (yyconst char msg[]  );
 	*yy_cp = '\0'; \
 	(yy_c_buf_p) = yy_cp;
 
-#define YY_NUM_RULES 46
-#define YY_END_OF_BUFFER 47
+#define YY_NUM_RULES 47
+#define YY_END_OF_BUFFER 48
 /* This struct is not used in this scanner,
    but its presence is necessary. */
 struct yy_trans_info
@@ -387,22 +387,22 @@ struct yy_trans_info
 	};
 static yyconst flex_int16_t yy_accept[151] =
     {   0,
-        0,    0,   47,   45,    1,   42,   38,   38,   38,   45,
-        2,    3,   38,   43,   36,   31,   34,   39,   39,   39,
-       39,   39,   39,   39,   39,   39,   39,   39,   39,   39,
-       38,    1,   37,   29,    0,    0,   43,    0,   35,   33,
-       39,   39,   39,   39,   39,   39,   39,   39,   39,   39,
-       39,   39,   39,   39,   39,   39,   39,   39,   39,   39,
-       30,   40,    0,   44,    0,   44,   32,   39,   39,   39,
-       39,   39,   39,   39,   39,   39,    7,   15,   10,   39,
-       39,   39,   24,   39,   39,   39,   39,   39,   39,   39,
-       39,   39,   39,   39,   39,   39,   39,   39,   20,   39,
+        0,    0,   48,   46,    1,   43,   39,   39,   39,   46,
+        2,    3,   39,   44,   37,   32,   35,   40,   40,   40,
+       40,   40,   40,   40,   40,   40,   40,   40,   40,   40,
+       39,    1,   38,   30,    0,    0,   44,    0,   36,   34,
+       40,   40,   40,   40,   40,   40,   40,   29,   40,   40,
+       40,   40,   40,   40,   40,   40,   40,   40,   40,   40,
+       31,   41,    0,   45,    0,   45,   33,   40,   40,   40,
+       40,   40,   40,   40,   40,   40,    7,   15,   10,   40,
+       40,   40,   24,   40,   40,   40,   40,   40,   40,   40,
+       40,   40,   40,   40,   40,   40,   40,   40,   20,   40,
 
-       18,   11,   39,   39,   39,   39,    9,   39,   39,   39,
-       39,   39,   25,   39,   39,   39,   39,   39,   39,   39,
-       39,   39,   39,    5,   39,   39,   39,   39,   22,   16,
-       39,   39,   39,   19,    8,   17,   39,   21,   28,   13,
-       23,   27,   39,   39,   26,   12,   14,    6,    4,    0
+       18,   11,   40,   40,   40,   40,    9,   40,   40,   40,
+       40,   40,   25,   40,   40,   40,   40,   40,   40,   40,
+       40,   40,   40,    5,   40,   40,   40,   40,   22,   16,
+       40,   40,   40,   19,    8,   17,   40,   21,   28,   13,
+       23,   27,   40,   40,   26,   12,   14,    6,    4,    0
     } ;
 
 static yyconst YY_CHAR yy_ec[256] =
@@ -564,13 +564,17 @@ char *yytext;
     #include<cstring>
     #include"sqlparse.tab.hpp"
     #include<iostream>
+    #include<stdlib.h>
+    #include<fstream>
     string temp;
     string tempnum;
     string tempdou;
     int flag_comp;
     int flag_ifint=0;
     int flag_ifdou=0;
-#line 574 "scanner.cpp"
+    ofstream pw("lexical.dyd");
+    //int yylval;
+#line 578 "scanner.cpp"
 
 #define INITIAL 0
 
@@ -788,9 +792,9 @@ YY_DECL
 		}
 
 	{
-#line 50 "sqlparse.l"
+#line 55 "sqlparse.l"
 
-#line 794 "scanner.cpp"
+#line 798 "scanner.cpp"
 
 	while ( /*CONSTCOND*/1 )		/* loops until end-of-file is reached */
 		{
@@ -849,248 +853,256 @@ do_action:	/* This label is used only to access EOF actions. */
 
 case 1:
 YY_RULE_SETUP
-#line 51 "sqlparse.l"
+#line 56 "sqlparse.l"
 ;
 	YY_BREAK
 case 2:
 YY_RULE_SETUP
-#line 52 "sqlparse.l"
-{ return *yytext;}
+#line 57 "sqlparse.l"
+{pw<<yytext<<"   "<<yy_act<<endl; return *yytext;}
 	YY_BREAK
 case 3:
 YY_RULE_SETUP
-#line 53 "sqlparse.l"
-{ return *yytext;}
+#line 58 "sqlparse.l"
+{ pw<<yytext<<"   "<<yy_act<<endl; return *yytext;}
 	YY_BREAK
 case 4:
 YY_RULE_SETUP
-#line 54 "sqlparse.l"
-{ return DATABASE; }
+#line 59 "sqlparse.l"
+{ pw<<yytext<<"   "<<yy_act<<endl; return DATABASE; }
 	YY_BREAK
 case 5:
 YY_RULE_SETUP
-#line 55 "sqlparse.l"
-{ return TABLE; }
+#line 60 "sqlparse.l"
+{ pw<<yytext<<"   "<<yy_act<<endl; return TABLE; }
 	YY_BREAK
 case 6:
 YY_RULE_SETUP
-#line 56 "sqlparse.l"
-{ return VARCHAR; }
+#line 61 "sqlparse.l"
+{ pw<<yytext<<"   "<<yy_act<<endl; return VARCHAR; }
 	YY_BREAK
 case 7:
 YY_RULE_SETUP
-#line 57 "sqlparse.l"
-{ return INT; }
+#line 62 "sqlparse.l"
+{ pw<<yytext<<"   "<<yy_act<<endl; return INT; }
 	YY_BREAK
 case 8:
 YY_RULE_SETUP
-#line 58 "sqlparse.l"
-{ return DOUBLE; }
+#line 63 "sqlparse.l"
+{ pw<<yytext<<"   "<<yy_act<<endl; return DOUBLE; }
 	YY_BREAK
 case 9:
 YY_RULE_SETUP
-#line 59 "sqlparse.l"
-{ return TIME; }
+#line 64 "sqlparse.l"
+{ pw<<yytext<<"   "<<yy_act<<endl; return TIME; }
 	YY_BREAK
 case 10:
 YY_RULE_SETUP
-#line 60 "sqlparse.l"
-{ return NOT; }
+#line 65 "sqlparse.l"
+{ pw<<yytext<<"   "<<yy_act<<endl; return NOT; }
 	YY_BREAK
 case 11:
 YY_RULE_SETUP
-#line 61 "sqlparse.l"
-{ return NULLS; }
+#line 66 "sqlparse.l"
+{ pw<<yytext<<"   "<<yy_act<<endl; return NULLS; }
 	YY_BREAK
 case 12:
 YY_RULE_SETUP
-#line 62 "sqlparse.l"
-{ return DEFAULT; }
+#line 67 "sqlparse.l"
+{ pw<<yytext<<"   "<<yy_act<<endl; return DEFAULT; }
 	YY_BREAK
 case 13:
 YY_RULE_SETUP
-#line 63 "sqlparse.l"
-{ return UNIQUE; }
+#line 68 "sqlparse.l"
+{ pw<<yytext<<"   "<<yy_act<<endl; return UNIQUE; }
 	YY_BREAK
 case 14:
 YY_RULE_SETUP
-#line 64 "sqlparse.l"
-{ return PRIMARY; }
+#line 69 "sqlparse.l"
+{ pw<<yytext<<"   "<<yy_act<<endl; return PRIMARY; }
 	YY_BREAK
 case 15:
 YY_RULE_SETUP
-#line 65 "sqlparse.l"
-{ return KEY; }
+#line 70 "sqlparse.l"
+{ pw<<yytext<<"   "<<yy_act<<endl; return KEY; }
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
-#line 66 "sqlparse.l"
-{ return CREATE; }
+#line 71 "sqlparse.l"
+{ pw<<yytext<<"   "<<yy_act<<endl; return CREATE; }
 	YY_BREAK
 case 17:
 YY_RULE_SETUP
-#line 67 "sqlparse.l"
-{ return INSERT; }
+#line 72 "sqlparse.l"
+{ pw<<yytext<<"   "<<yy_act<<endl; return INSERT; }
 	YY_BREAK
 case 18:
 YY_RULE_SETUP
-#line 68 "sqlparse.l"
-{ return INTO; }
+#line 73 "sqlparse.l"
+{ pw<<yytext<<"   "<<yy_act<<endl; return INTO; }
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
-#line 69 "sqlparse.l"
-{ return DELETE; }
+#line 74 "sqlparse.l"
+{ pw<<yytext<<"   "<<yy_act<<endl; return DELETE; }
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
-#line 70 "sqlparse.l"
-{ return FROM; }
+#line 75 "sqlparse.l"
+{ pw<<yytext<<"   "<<yy_act<<endl; return FROM; }
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
-#line 71 "sqlparse.l"
-{ return SELECT; }
+#line 76 "sqlparse.l"
+{ pw<<yytext<<"   "<<yy_act<<endl; return SELECT; }
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
-#line 72 "sqlparse.l"
-{ return WHERE; }
+#line 77 "sqlparse.l"
+{ pw<<yytext<<"   "<<yy_act<<endl; return WHERE; }
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
-#line 73 "sqlparse.l"
-{ return UPDATE; }
+#line 78 "sqlparse.l"
+{ pw<<yytext<<"   "<<yy_act<<endl; return UPDATE; }
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
-#line 74 "sqlparse.l"
-{ return SET; }
+#line 79 "sqlparse.l"
+{ pw<<yytext<<"   "<<yy_act<<endl; return SET; }
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
-#line 75 "sqlparse.l"
-{ return CHECK; }
+#line 80 "sqlparse.l"
+{ pw<<yytext<<"   "<<yy_act<<endl; return CHECK; }
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 76 "sqlparse.l"
-{ return DECIMAL; }
+#line 81 "sqlparse.l"
+{ pw<<yytext<<"   "<<yy_act<<endl; return DECIMAL; }
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 77 "sqlparse.l"
-{ return VALUES; }
+#line 82 "sqlparse.l"
+{ pw<<yytext<<"   "<<yy_act<<endl; return VALUES; }
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 78 "sqlparse.l"
-{ return STRING; }
+#line 83 "sqlparse.l"
+{pw<<yytext<<"   "<<yy_act<<endl; return STRING; }
 	YY_BREAK
 case 29:
 YY_RULE_SETUP
-#line 81 "sqlparse.l"
-{ flag_comp=8 ;return ANDOP; }
+#line 84 "sqlparse.l"
+{pw<<yytext<<"   "<<yy_act<<endl; return IN;}
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 82 "sqlparse.l"
-{ flag_comp=9 ;return OR; }
+#line 87 "sqlparse.l"
+{ pw<<yytext<<"   "<<yy_act<<endl; flag_comp=8 ;return ANDOP; }
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 83 "sqlparse.l"
-{ flag_comp=1 ;return COMPARISON; }
+#line 88 "sqlparse.l"
+{ pw<<yytext<<"   "<<yy_act<<endl; flag_comp=9 ;return OR; }
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 84 "sqlparse.l"
-{ return COMPARISON; }
+#line 89 "sqlparse.l"
+{ pw<<yytext<<"   "<<yy_act<<endl; flag_comp=1 ;return COMPARISON; }
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 85 "sqlparse.l"
-{ flag_comp=3 ;return COMPARISON; }
+#line 90 "sqlparse.l"
+{ pw<<yytext<<"   "<<yy_act<<endl; return COMPARISON; }
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
-#line 86 "sqlparse.l"
-{ flag_comp=4 ;return COMPARISON; }
+#line 91 "sqlparse.l"
+{ pw<<yytext<<"   "<<yy_act<<endl; flag_comp=3 ;return COMPARISON; }
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
-#line 87 "sqlparse.l"
-{ flag_comp=5 ;return COMPARISON; }
+#line 92 "sqlparse.l"
+{ pw<<yytext<<"   "<<yy_act<<endl; flag_comp=4 ;return COMPARISON; }
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
-#line 88 "sqlparse.l"
-{ flag_comp=6 ;return COMPARISON; }
+#line 93 "sqlparse.l"
+{ pw<<yytext<<"   "<<yy_act<<endl; flag_comp=5 ;return COMPARISON; }
 	YY_BREAK
 case 37:
 YY_RULE_SETUP
-#line 89 "sqlparse.l"
-{ flag_comp=7 ;return COMPARISON; }
+#line 94 "sqlparse.l"
+{ pw<<yytext<<"   "<<yy_act<<endl; flag_comp=6 ;return COMPARISON; }
 	YY_BREAK
 case 38:
 YY_RULE_SETUP
-#line 90 "sqlparse.l"
-{ return yytext[0]; }
+#line 95 "sqlparse.l"
+{ pw<<yytext<<"   "<<yy_act<<endl; flag_comp=7 ;return COMPARISON; }
 	YY_BREAK
 case 39:
 YY_RULE_SETUP
-#line 91 "sqlparse.l"
-{ temp=yytext; flag_ifint=0; flag_ifdou=0; return NAME;}
+#line 96 "sqlparse.l"
+{ pw<<yytext<<"   "<<yy_act<<endl; return yytext[0]; }
 	YY_BREAK
 case 40:
 YY_RULE_SETUP
-#line 92 "sqlparse.l"
-{ temp=yytext; flag_ifint=0; flag_ifdou=0; return NAME;}
+#line 97 "sqlparse.l"
+{ pw<<"NAME"<<"   "<<yy_act<<endl; temp=yytext; flag_ifint=0; flag_ifdou=0; return NAME;}
 	YY_BREAK
 case 41:
 YY_RULE_SETUP
-#line 94 "sqlparse.l"
-{
-    return *yytext;
-}
+#line 98 "sqlparse.l"
+{ pw<<"NAME"<<"   "<<yy_act<<endl; temp=yytext; flag_ifint=0; flag_ifdou=0; return NAME;}
 	YY_BREAK
 case 42:
-/* rule 42 can match eol */
 YY_RULE_SETUP
-#line 97 "sqlparse.l"
+#line 100 "sqlparse.l"
 {
+    pw<<yytext<<"   "<<yy_act<<endl;
     return *yytext;
 }
 	YY_BREAK
 case 43:
+/* rule 43 can match eol */
 YY_RULE_SETUP
-#line 100 "sqlparse.l"
+#line 104 "sqlparse.l"
 {
+    return *yytext;
+}
+	YY_BREAK
+case 44:
+YY_RULE_SETUP
+#line 107 "sqlparse.l"
+{
+    pw<<yytext<<"   "<<yy_act<<endl;
     tempnum=yytext;
     flag_ifint=1;
     return INTNUM;
 }
 	YY_BREAK
-case 44:
+case 45:
 YY_RULE_SETUP
-#line 105 "sqlparse.l"
+#line 113 "sqlparse.l"
 {
+    pw<<yytext<<"   "<<yy_act<<endl;
     tempdou=yytext;
     flag_ifdou=1;
     return DOUNUM;
 }
 	YY_BREAK
-case 45:
-YY_RULE_SETUP
-#line 111 "sqlparse.l"
-printf("illegal identifier\n");
-	YY_BREAK
 case 46:
 YY_RULE_SETUP
-#line 112 "sqlparse.l"
+#line 120 "sqlparse.l"
+printf("illegal identifier\n");
+	YY_BREAK
+case 47:
+YY_RULE_SETUP
+#line 121 "sqlparse.l"
 ECHO;
 	YY_BREAK
-#line 1094 "scanner.cpp"
+#line 1106 "scanner.cpp"
 case YY_STATE_EOF(INITIAL):
 	yyterminate();
 
@@ -2091,7 +2103,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 112 "sqlparse.l"
+#line 121 "sqlparse.l"
 
 
 int yywrap(void)

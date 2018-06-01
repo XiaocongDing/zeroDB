@@ -3,12 +3,16 @@
     #include<cstring>
     #include"sqlparse.tab.hpp"
     #include<iostream>
+    #include<stdlib.h>
+    #include<fstream>
     string temp;
     string tempnum;
     string tempdou;
     int flag_comp;
     int flag_ifint=0;
     int flag_ifdou=0;
+    ofstream pw("lexical.dyd");
+    //int yylval;
 %}
 space [\ \t]+
 num [0-9]+
@@ -26,6 +30,7 @@ DEFAULT DEFAULT
 UNIQUE UNIQUE
 PRIMARY PRIMARY
 KEY KEY
+IN IN
 
 CREATE CREATE
 INSERT INSERT
@@ -49,60 +54,64 @@ ANDOP [/&&/]
 OR [/||/]
 %%
 {space} ;
-"(" { return *yytext;}
-")" { return *yytext;}
-"DATABASE" { return DATABASE; }
-"TABLE" { return TABLE; }
-"VARCHAR" { return VARCHAR; }
-"INT" { return INT; }
-"DOUBLE" { return DOUBLE; }
-"TIME" { return TIME; }
-"NOT" { return NOT; }
-"NULL" { return NULLS; }
-"DEFAULT" { return DEFAULT; }
-"UNIQUE" { return UNIQUE; }
-"PRIMARY" { return PRIMARY; }
-"KEY"  { return KEY; }
-"CREATE" { return CREATE; }
-"INSERT" { return INSERT; }
-"INTO" { return INTO; }
-"DELETE" { return DELETE; }
-"FROM" { return FROM; }
-"SELECT" { return SELECT; }
-"WHERE" { return WHERE; }
-"UPDATE" { return UPDATE; }
-"SET" { return SET; }
-"CHECK" { return CHECK; }
-"DECIMAL" { return DECIMAL; }
-"VALUES"  { return VALUES; }
-"STRING" { return STRING; }
+"(" {pw<<yytext<<"   "<<yy_act<<endl; return *yytext;}
+")" { pw<<yytext<<"   "<<yy_act<<endl; return *yytext;}
+"DATABASE" { pw<<yytext<<"   "<<yy_act<<endl; return DATABASE; }
+"TABLE" { pw<<yytext<<"   "<<yy_act<<endl; return TABLE; }
+"VARCHAR" { pw<<yytext<<"   "<<yy_act<<endl; return VARCHAR; }
+"INT" { pw<<yytext<<"   "<<yy_act<<endl; return INT; }
+"DOUBLE" { pw<<yytext<<"   "<<yy_act<<endl; return DOUBLE; }
+"TIME" { pw<<yytext<<"   "<<yy_act<<endl; return TIME; }
+"NOT" { pw<<yytext<<"   "<<yy_act<<endl; return NOT; }
+"NULL" { pw<<yytext<<"   "<<yy_act<<endl; return NULLS; }
+"DEFAULT" { pw<<yytext<<"   "<<yy_act<<endl; return DEFAULT; }
+"UNIQUE" { pw<<yytext<<"   "<<yy_act<<endl; return UNIQUE; }
+"PRIMARY" { pw<<yytext<<"   "<<yy_act<<endl; return PRIMARY; }
+"KEY"  { pw<<yytext<<"   "<<yy_act<<endl; return KEY; }
+"CREATE" { pw<<yytext<<"   "<<yy_act<<endl; return CREATE; }
+"INSERT" { pw<<yytext<<"   "<<yy_act<<endl; return INSERT; }
+"INTO" { pw<<yytext<<"   "<<yy_act<<endl; return INTO; }
+"DELETE" { pw<<yytext<<"   "<<yy_act<<endl; return DELETE; }
+"FROM" { pw<<yytext<<"   "<<yy_act<<endl; return FROM; }
+"SELECT" { pw<<yytext<<"   "<<yy_act<<endl; return SELECT; }
+"WHERE" { pw<<yytext<<"   "<<yy_act<<endl; return WHERE; }
+"UPDATE" { pw<<yytext<<"   "<<yy_act<<endl; return UPDATE; }
+"SET" { pw<<yytext<<"   "<<yy_act<<endl; return SET; }
+"CHECK" { pw<<yytext<<"   "<<yy_act<<endl; return CHECK; }
+"DECIMAL" { pw<<yytext<<"   "<<yy_act<<endl; return DECIMAL; }
+"VALUES"  { pw<<yytext<<"   "<<yy_act<<endl; return VALUES; }
+"STRING" {pw<<yytext<<"   "<<yy_act<<endl; return STRING; }
+"IN" {pw<<yytext<<"   "<<yy_act<<endl; return IN;}
 
 
-"&&" { flag_comp=8 ;return ANDOP; }
-"||" { flag_comp=9 ;return OR; }
-"=" { flag_comp=1 ;return COMPARISON; }
-"<=>" { return COMPARISON; }
-">=" { flag_comp=3 ;return COMPARISON; }
-">" { flag_comp=4 ;return COMPARISON; }
-"<=" { flag_comp=5 ;return COMPARISON; }
-"<" { flag_comp=6 ;return COMPARISON; }
-"!=" { flag_comp=7 ;return COMPARISON; }
-[-+&~|^/%*(),.;!] { return yytext[0]; }
-[A-Za-z][A-Za-z0-9_]*     { temp=yytext; flag_ifint=0; flag_ifdou=0; return NAME;}
-'[A-Za-z][A-Za-z0-9_]*'     { temp=yytext; flag_ifint=0; flag_ifdou=0; return NAME;}
+"&&" { pw<<yytext<<"   "<<yy_act<<endl; flag_comp=8 ;return ANDOP; }
+"||" { pw<<yytext<<"   "<<yy_act<<endl; flag_comp=9 ;return OR; }
+"=" { pw<<yytext<<"   "<<yy_act<<endl; flag_comp=1 ;return COMPARISON; }
+"<=>" { pw<<yytext<<"   "<<yy_act<<endl; return COMPARISON; }
+">=" { pw<<yytext<<"   "<<yy_act<<endl; flag_comp=3 ;return COMPARISON; }
+">" { pw<<yytext<<"   "<<yy_act<<endl; flag_comp=4 ;return COMPARISON; }
+"<=" { pw<<yytext<<"   "<<yy_act<<endl; flag_comp=5 ;return COMPARISON; }
+"<" { pw<<yytext<<"   "<<yy_act<<endl; flag_comp=6 ;return COMPARISON; }
+"!=" { pw<<yytext<<"   "<<yy_act<<endl; flag_comp=7 ;return COMPARISON; }
+[-+&~|^/%*(),.;!] { pw<<yytext<<"   "<<yy_act<<endl; return yytext[0]; }
+[A-Za-z][A-Za-z0-9_]*     { pw<<"NAME"<<"   "<<yy_act<<endl; temp=yytext; flag_ifint=0; flag_ifdou=0; return NAME;}
+'[A-Za-z][A-Za-z0-9_]*'     { pw<<"NAME"<<"   "<<yy_act<<endl; temp=yytext; flag_ifint=0; flag_ifdou=0; return NAME;}
 
 {op} {
+    pw<<yytext<<"   "<<yy_act<<endl;
     return *yytext;
 }
 \n {
     return *yytext;
 }
 {num} {
+    pw<<yytext<<"   "<<yy_act<<endl;
     tempnum=yytext;
     flag_ifint=1;
     return INTNUM;
 }
 {number} {
+    pw<<yytext<<"   "<<yy_act<<endl;
     tempdou=yytext;
     flag_ifdou=1;
     return DOUNUM;

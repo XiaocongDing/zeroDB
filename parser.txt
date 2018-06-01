@@ -1,0 +1,530 @@
+Starting parse
+Entering state 0
+Reducing stack by rule 3 (line 124):
+-> $$ = nterm start ()
+Stack now 0
+Entering state 1
+Reading a token: Next token is token SELECT ()
+Shifting token SELECT ()
+Entering state 6
+Reading a token: Next token is token '*' ()
+Shifting token '*' ()
+Entering state 24
+Reducing stack by rule 45 (line 397):
+   $1 = token '*' ()
+-> $$ = nterm select_expr_list ()
+Stack now 0 1 6
+Entering state 26
+Reading a token: Next token is token FROM ()
+Shifting token FROM ()
+Entering state 39
+Reducing stack by rule 40 (line 358):
+-> $$ = nterm $@1 ()
+Stack now 0 1 6 26 39
+Entering state 61
+Reading a token: Next token is token NAME ()
+Shifting token NAME ()
+Entering state 83
+Reducing stack by rule 42 (line 376):
+   $1 = token NAME ()
+-> $$ = nterm select_table_name ()
+Stack now 0 1 6 26 39 61
+Entering state 84
+Reading a token: Next token is token ';' ()
+Reducing stack by rule 46 (line 402):
+-> $$ = nterm opt_where ()
+Stack now 0 1 6 26 39 61 84
+Entering state 109
+Reducing stack by rule 41 (line 358):
+   $1 = token SELECT ()
+   $2 = nterm select_expr_list ()
+   $3 = token FROM ()
+   $4 = nterm $@1 ()
+   $5 = nterm select_table_name ()
+   $6 = nterm opt_where ()
+-> $$ = nterm select_stmt ()
+Stack now 0 1
+Entering state 15
+Reducing stack by rule 4 (line 127):
+   $1 = nterm select_stmt ()
+-> $$ = nterm stmt ()
+Stack now 0 1
+Entering state 9
+Next token is token ';' ()
+Shifting token ';' ()
+Entering state 28
+Reading a token: Next token is token '\n' ()
+Shifting token '\n' ()
+Entering state 41
+Reducing stack by rule 1 (line 112):
+   $1 = nterm start ()
+   $2 = nterm stmt ()
+   $3 = token ';' ()
+   $4 = token '\n' ()
+-> $$ = nterm start ()
+Stack now 0
+Entering state 1
+Reading a token: Next token is token INSERT ()
+Shifting token INSERT ()
+Entering state 4
+Reading a token: Next token is token INTO ()
+Shifting token INTO ()
+Entering state 22
+Reading a token: Next token is token NAME ()
+Shifting token NAME ()
+Entering state 37
+Reducing stack by rule 29 (line 216):
+   $1 = token INSERT ()
+   $2 = token INTO ()
+   $3 = token NAME ()
+-> $$ = nterm insert_table_name ()
+Stack now 0 1
+Entering state 14
+Reading a token: Next token is token VALUES ()
+Reducing stack by rule 30 (line 227):
+-> $$ = nterm opt_col_names ()
+Stack now 0 1 14
+Entering state 31
+Next token is token VALUES ()
+Shifting token VALUES ()
+Entering state 53
+Reading a token: Next token is token '(' ()
+Shifting token '(' ()
+Entering state 70
+Reading a token: Next token is token INTNUM ()
+Shifting token INTNUM ()
+Entering state 55
+Reducing stack by rule 51 (line 430):
+   $1 = token INTNUM ()
+-> $$ = nterm expr ()
+Stack now 0 1 14 31 53 70
+Entering state 97
+Reading a token: Next token is token ',' ()
+Reducing stack by rule 36 (line 256):
+   $1 = nterm expr ()
+-> $$ = nterm insert_vals ()
+Stack now 0 1 14 31 53 70
+Entering state 96
+Next token is token ',' ()
+Shifting token ',' ()
+Entering state 115
+Reading a token: Next token is token NAME ()
+Shifting token NAME ()
+Entering state 58
+Reducing stack by rule 50 (line 418):
+   $1 = token NAME ()
+-> $$ = nterm expr ()
+Stack now 0 1 14 31 53 70 96 115
+Entering state 122
+Reading a token: Next token is token ',' ()
+Reducing stack by rule 38 (line 307):
+   $1 = nterm insert_vals ()
+   $2 = token ',' ()
+   $3 = nterm expr ()
+-> $$ = nterm insert_vals ()
+Stack now 0 1 14 31 53 70
+Entering state 96
+Next token is token ',' ()
+Shifting token ',' ()
+Entering state 115
+Reading a token: Next token is token NAME ()
+Shifting token NAME ()
+Entering state 58
+Reducing stack by rule 50 (line 418):
+   $1 = token NAME ()
+-> $$ = nterm expr ()
+Stack now 0 1 14 31 53 70 96 115
+Entering state 122
+Reading a token: Next token is token ',' ()
+Reducing stack by rule 38 (line 307):
+   $1 = nterm insert_vals ()
+   $2 = token ',' ()
+   $3 = nterm expr ()
+-> $$ = nterm insert_vals ()
+Stack now 0 1 14 31 53 70
+Entering state 96
+Next token is token ',' ()
+Shifting token ',' ()
+Entering state 115
+Reading a token: Next token is token INTNUM ()
+Shifting token INTNUM ()
+Entering state 55
+Reducing stack by rule 51 (line 430):
+   $1 = token INTNUM ()
+-> $$ = nterm expr ()
+Stack now 0 1 14 31 53 70 96 115
+Entering state 122
+Reading a token: Next token is token ')' ()
+Reducing stack by rule 38 (line 307):
+   $1 = nterm insert_vals ()
+   $2 = token ',' ()
+   $3 = nterm expr ()
+-> $$ = nterm insert_vals ()
+Stack now 0 1 14 31 53 70
+Entering state 96
+Next token is token ')' ()
+Shifting token ')' ()
+Entering state 114
+Reducing stack by rule 34 (line 235):
+   $1 = token '(' ()
+   $2 = nterm insert_vals ()
+   $3 = token ')' ()
+-> $$ = nterm insert_vals_list ()
+Stack now 0 1 14 31 53
+Entering state 71
+Reading a token: Next token is token ';' ()
+Reducing stack by rule 28 (line 204):
+   $1 = nterm insert_table_name ()
+   $2 = nterm opt_col_names ()
+   $3 = token VALUES ()
+   $4 = nterm insert_vals_list ()
+-> $$ = nterm insert_stmt ()
+Stack now 0 1
+Entering state 13
+Reducing stack by rule 6 (line 129):
+   $1 = nterm insert_stmt ()
+-> $$ = nterm stmt ()
+Stack now 0 1
+Entering state 9
+Next token is token ';' ()
+Shifting token ';' ()
+Entering state 28
+Reading a token: Next token is token '\n' ()
+Shifting token '\n' ()
+Entering state 41
+Reducing stack by rule 1 (line 112):
+   $1 = nterm start ()
+   $2 = nterm stmt ()
+   $3 = token ';' ()
+   $4 = token '\n' ()
+-> $$ = nterm start ()
+Stack now 0
+Entering state 1
+Reading a token: Next token is token SELECT ()
+Shifting token SELECT ()
+Entering state 6
+Reading a token: Next token is token '*' ()
+Shifting token '*' ()
+Entering state 24
+Reducing stack by rule 45 (line 397):
+   $1 = token '*' ()
+-> $$ = nterm select_expr_list ()
+Stack now 0 1 6
+Entering state 26
+Reading a token: Next token is token FROM ()
+Shifting token FROM ()
+Entering state 39
+Reducing stack by rule 40 (line 358):
+-> $$ = nterm $@1 ()
+Stack now 0 1 6 26 39
+Entering state 61
+Reading a token: Next token is token NAME ()
+Shifting token NAME ()
+Entering state 83
+Reducing stack by rule 42 (line 376):
+   $1 = token NAME ()
+-> $$ = nterm select_table_name ()
+Stack now 0 1 6 26 39 61
+Entering state 84
+Reading a token: Next token is token ';' ()
+Reducing stack by rule 46 (line 402):
+-> $$ = nterm opt_where ()
+Stack now 0 1 6 26 39 61 84
+Entering state 109
+Reducing stack by rule 41 (line 358):
+   $1 = token SELECT ()
+   $2 = nterm select_expr_list ()
+   $3 = token FROM ()
+   $4 = nterm $@1 ()
+   $5 = nterm select_table_name ()
+   $6 = nterm opt_where ()
+-> $$ = nterm select_stmt ()
+Stack now 0 1
+Entering state 15
+Reducing stack by rule 4 (line 127):
+   $1 = nterm select_stmt ()
+-> $$ = nterm stmt ()
+Stack now 0 1
+Entering state 9
+Next token is token ';' ()
+Shifting token ';' ()
+Entering state 28
+Reading a token: Next token is token '\n' ()
+Shifting token '\n' ()
+Entering state 41
+Reducing stack by rule 1 (line 112):
+   $1 = nterm start ()
+   $2 = nterm stmt ()
+   $3 = token ';' ()
+   $4 = token '\n' ()
+-> $$ = nterm start ()
+Stack now 0
+Entering state 1
+Reading a token: Next token is token NAME ()
+Shifting token NAME ()
+Entering state 8
+Reducing stack by rule 2 (line 117):
+   $1 = nterm start ()
+   $2 = token NAME ()
+-> $$ = nterm start ()
+Stack now 0
+Entering state 1
+Reading a token: Next token is token NAME ()
+Shifting token NAME ()
+Entering state 8
+Reducing stack by rule 2 (line 117):
+   $1 = nterm start ()
+   $2 = token NAME ()
+-> $$ = nterm start ()
+Stack now 0
+Entering state 1
+Reading a token: Next token is token '\n' ()
+Error: popping nterm start ()
+Stack now 0
+Cleanup: discarding lookahead token '\n' ()
+Stack now 0
+Starting parse
+Entering state 0
+Reducing stack by rule 3 (line 124):
+-> $$ = nterm start ()
+Stack now 0
+Entering state 1
+Reading a token: Next token is token NAME ()
+Shifting token NAME ()
+Entering state 8
+Reducing stack by rule 2 (line 117):
+   $1 = nterm start ()
+   $2 = token NAME ()
+-> $$ = nterm start ()
+Stack now 0
+Entering state 1
+Reading a token: Next token is token NAME ()
+Shifting token NAME ()
+Entering state 8
+Reducing stack by rule 2 (line 117):
+   $1 = nterm start ()
+   $2 = token NAME ()
+-> $$ = nterm start ()
+Stack now 0
+Entering state 1
+Reading a token: Next token is token ';' ()
+Error: popping nterm start ()
+Stack now 0
+Cleanup: discarding lookahead token ';' ()
+Stack now 0
+Starting parse
+Entering state 0
+Reducing stack by rule 3 (line 124):
+-> $$ = nterm start ()
+Stack now 0
+Entering state 1
+Reading a token: Next token is token '\n' ()
+Error: popping nterm start ()
+Stack now 0
+Cleanup: discarding lookahead token '\n' ()
+Stack now 0
+Starting parse
+Entering state 0
+Reducing stack by rule 3 (line 124):
+-> $$ = nterm start ()
+Stack now 0
+Entering state 1
+Reading a token: Next token is token NAME ()
+Shifting token NAME ()
+Entering state 8
+Reducing stack by rule 2 (line 117):
+   $1 = nterm start ()
+   $2 = token NAME ()
+-> $$ = nterm start ()
+Stack now 0
+Entering state 1
+Reading a token: Next token is token NAME ()
+Shifting token NAME ()
+Entering state 8
+Reducing stack by rule 2 (line 117):
+   $1 = nterm start ()
+   $2 = token NAME ()
+-> $$ = nterm start ()
+Stack now 0
+Entering state 1
+Reading a token: Next token is token NAME ()
+Shifting token NAME ()
+Entering state 8
+Reducing stack by rule 2 (line 117):
+   $1 = nterm start ()
+   $2 = token NAME ()
+-> $$ = nterm start ()
+Stack now 0
+Entering state 1
+Reading a token: Next token is token '\n' ()
+Error: popping nterm start ()
+Stack now 0
+Cleanup: discarding lookahead token '\n' ()
+Stack now 0
+Starting parse
+Entering state 0
+Reducing stack by rule 3 (line 124):
+-> $$ = nterm start ()
+Stack now 0
+Entering state 1
+Reading a token: Next token is token NAME ()
+Shifting token NAME ()
+Entering state 8
+Reducing stack by rule 2 (line 117):
+   $1 = nterm start ()
+   $2 = token NAME ()
+-> $$ = nterm start ()
+Stack now 0
+Entering state 1
+Reading a token: Next token is token NAME ()
+Shifting token NAME ()
+Entering state 8
+Reducing stack by rule 2 (line 117):
+   $1 = nterm start ()
+   $2 = token NAME ()
+-> $$ = nterm start ()
+Stack now 0
+Entering state 1
+Reading a token: Next token is token NAME ()
+Shifting token NAME ()
+Entering state 8
+Reducing stack by rule 2 (line 117):
+   $1 = nterm start ()
+   $2 = token NAME ()
+-> $$ = nterm start ()
+Stack now 0
+Entering state 1
+Reading a token: Next token is token ';' ()
+Error: popping nterm start ()
+Stack now 0
+Cleanup: discarding lookahead token ';' ()
+Stack now 0
+Starting parse
+Entering state 0
+Reducing stack by rule 3 (line 124):
+-> $$ = nterm start ()
+Stack now 0
+Entering state 1
+Reading a token: Next token is token '\n' ()
+Error: popping nterm start ()
+Stack now 0
+Cleanup: discarding lookahead token '\n' ()
+Stack now 0
+Starting parse
+Entering state 0
+Reducing stack by rule 3 (line 124):
+-> $$ = nterm start ()
+Stack now 0
+Entering state 1
+Reading a token: Next token is token NAME ()
+Shifting token NAME ()
+Entering state 8
+Reducing stack by rule 2 (line 117):
+   $1 = nterm start ()
+   $2 = token NAME ()
+-> $$ = nterm start ()
+Stack now 0
+Entering state 1
+Reading a token: Next token is token NAME ()
+Shifting token NAME ()
+Entering state 8
+Reducing stack by rule 2 (line 117):
+   $1 = nterm start ()
+   $2 = token NAME ()
+-> $$ = nterm start ()
+Stack now 0
+Entering state 1
+Reading a token: Next token is token NAME ()
+Shifting token NAME ()
+Entering state 8
+Reducing stack by rule 2 (line 117):
+   $1 = nterm start ()
+   $2 = token NAME ()
+-> $$ = nterm start ()
+Stack now 0
+Entering state 1
+Reading a token: Next token is token '\n' ()
+Error: popping nterm start ()
+Stack now 0
+Cleanup: discarding lookahead token '\n' ()
+Stack now 0
+Starting parse
+Entering state 0
+Reducing stack by rule 3 (line 124):
+-> $$ = nterm start ()
+Stack now 0
+Entering state 1
+Reading a token: Next token is token SELECT ()
+Shifting token SELECT ()
+Entering state 6
+Reading a token: Next token is token '*' ()
+Shifting token '*' ()
+Entering state 24
+Reducing stack by rule 45 (line 397):
+   $1 = token '*' ()
+-> $$ = nterm select_expr_list ()
+Stack now 0 1 6
+Entering state 26
+Reading a token: Next token is token FROM ()
+Shifting token FROM ()
+Entering state 39
+Reducing stack by rule 40 (line 358):
+-> $$ = nterm $@1 ()
+Stack now 0 1 6 26 39
+Entering state 61
+Reading a token: Next token is token NAME ()
+Shifting token NAME ()
+Entering state 83
+Reducing stack by rule 42 (line 376):
+   $1 = token NAME ()
+-> $$ = nterm select_table_name ()
+Stack now 0 1 6 26 39 61
+Entering state 84
+Reading a token: Next token is token ';' ()
+Reducing stack by rule 46 (line 402):
+-> $$ = nterm opt_where ()
+Stack now 0 1 6 26 39 61 84
+Entering state 109
+Reducing stack by rule 41 (line 358):
+   $1 = token SELECT ()
+   $2 = nterm select_expr_list ()
+   $3 = token FROM ()
+   $4 = nterm $@1 ()
+   $5 = nterm select_table_name ()
+   $6 = nterm opt_where ()
+-> $$ = nterm select_stmt ()
+Stack now 0 1
+Entering state 15
+Reducing stack by rule 4 (line 127):
+   $1 = nterm select_stmt ()
+-> $$ = nterm stmt ()
+Stack now 0 1
+Entering state 9
+Next token is token ';' ()
+Shifting token ';' ()
+Entering state 28
+Reading a token: Next token is token '\n' ()
+Shifting token '\n' ()
+Entering state 41
+Reducing stack by rule 1 (line 112):
+   $1 = nterm start ()
+   $2 = nterm stmt ()
+   $3 = token ';' ()
+   $4 = token '\n' ()
+-> $$ = nterm start ()
+Stack now 0
+Entering state 1
+Reading a token: Next token is token NAME ()
+Shifting token NAME ()
+Entering state 8
+Reducing stack by rule 2 (line 117):
+   $1 = nterm start ()
+   $2 = token NAME ()
+-> $$ = nterm start ()
+Stack now 0
+Entering state 1
+Reading a token: Next token is token '\n' ()
+Error: popping nterm start ()
+Stack now 0
+Cleanup: discarding lookahead token '\n' ()
+Stack now 0

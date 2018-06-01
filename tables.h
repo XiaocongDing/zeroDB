@@ -3,6 +3,7 @@
 #include<map>
 #include<stdio.h>
 #include<stdlib.h>
+#include<fstream>
 
 // VARCHAR 1 INT 2 DOUBLE 3 TIME 4
 
@@ -15,8 +16,8 @@ class table{
     int val_num;//行
     int col_num;//属性
     string name;
-    int valp;
-    int colp;
+    int valp;//总行数-1
+    int colp;//总列数-1
     int dataattr[50];
     int datatype[50];
     int showval[1000];
@@ -29,10 +30,96 @@ class table{
     int showcol_c;
     int delete_v;
     int update_c;
+    string filebuffer[100];
+    string namebuffer;
     string tables[1000][50];
     std::map<char,int> first;
     table(){};
     int create_table();
+    void filein(string filename){
+        ifstream ifs;
+        ifs.open (filename.c_str());
+        getline(ifs,namebuffer);
+        cout<<namebuffer<<endl;
+        int t=0;
+        int bt=0;
+        
+        bt=namebuffer.find("##",t);
+        name=namebuffer.substr(t,bt-t);
+        t=bt+2;
+        bt=namebuffer.find("##",t);
+        valp=atoi(namebuffer.substr(t,bt-t).c_str())-1;
+        t=bt+2;
+        bt=namebuffer.find("##",t);
+        colp=atoi(namebuffer.substr(t,bt-t).c_str())-1;
+
+        bt=0;
+        t=0;
+        getline(ifs,namebuffer);
+        for(int i=0;i<colp+1;i++)
+        {
+            bt=namebuffer.find("##",t);
+            datatype[i]=atoi(namebuffer.substr(t,bt-t).c_str());
+            t=bt+2;
+        }
+
+        bt=0;
+        t=0;
+        getline(ifs,namebuffer);
+        for(int i=0;i<colp+1;i++)
+        {
+            bt=namebuffer.find("##",t);
+            dataattr[i]=atoi(namebuffer.substr(t,bt-t).c_str());
+            t=bt+2;
+        }
+
+
+        int k=0;
+        while(!ifs.eof())
+        {
+            getline(ifs,filebuffer[k]);
+            k++;
+        }
+        
+        for(int i=0;i<valp+1;i++)
+        {
+            t=0;
+            bt=0;
+            for(int j=0;j<colp+1;j++)
+            {
+                
+                    bt=filebuffer[i].find("##",t);
+                    tables[i][j]=filebuffer[i].substr(t,bt-t);
+                    t=bt+2;
+            }
+        }
+        ifs.close();
+    }
+    void fileout(string filename){
+        ofstream ofs;
+        ofs.open (filename.c_str());
+        ofs <<name<<"##"<<valp+1<<"##"<<colp+1<<"##"<<endl;
+        for(int i=0;i<colp+1;i++)
+        {
+            ofs<<datatype[i]<<"##";
+        }
+        ofs<<"  //datatype"<<endl;
+        for(int i=0;i<colp+1;i++)
+        {
+            ofs<<dataattr[i]<<"##";
+        }
+        ofs<<"  //dataattr"<<endl;
+
+        for(int i=0;i<valp+1;i++)
+        {
+            for(int j=0;j<colp+1;j++)
+            {
+                ofs << tables[i][j]<<"##";
+            }
+            ofs<<endl;
+        }
+        ofs.close();
+    }
     void init_table(){
         valp=-1;
         colp=-1;

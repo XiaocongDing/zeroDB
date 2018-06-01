@@ -34,7 +34,7 @@
 # define YY_YY_SQLPARSE_TAB_HPP_INCLUDED
 /* Debug traces.  */
 #ifndef YYDEBUG
-# define YYDEBUG 0
+# define YYDEBUG 1
 #endif
 #if YYDEBUG
 extern int yydebug;
@@ -57,25 +57,26 @@ extern int yydebug;
     UNIQUE = 267,
     PRIMARY = 268,
     KEY = 269,
-    CREATE = 270,
-    INSERT = 271,
-    INTO = 272,
-    DELETE = 273,
-    FROM = 274,
-    SELECT = 275,
-    WHERE = 276,
-    UPDATE = 277,
-    SET = 278,
-    CHECK = 279,
-    VALUES = 280,
-    NAME = 281,
-    INTNUM = 282,
-    DOUNUM = 283,
-    DECIMAL = 284,
-    STRING = 285,
-    COMPARISON = 286,
-    ANDOP = 287,
-    OR = 288
+    IN = 270,
+    CREATE = 271,
+    INSERT = 272,
+    INTO = 273,
+    DELETE = 274,
+    FROM = 275,
+    SELECT = 276,
+    WHERE = 277,
+    UPDATE = 278,
+    SET = 279,
+    CHECK = 280,
+    VALUES = 281,
+    NAME = 282,
+    INTNUM = 283,
+    DOUNUM = 284,
+    DECIMAL = 285,
+    STRING = 286,
+    COMPARISON = 287,
+    ANDOP = 288,
+    OR = 289
   };
 #endif
 
@@ -84,14 +85,14 @@ extern int yydebug;
 
 union YYSTYPE
 {
-#line 54 "sqlparse.ypp" /* yacc.c:1909  */
+#line 55 "sqlparse.ypp" /* yacc.c:1909  */
 
     int intval;       
     double floatval;      
     char strval[16];  
     //int subtok; 
 
-#line 95 "sqlparse.tab.hpp" /* yacc.c:1909  */
+#line 96 "sqlparse.tab.hpp" /* yacc.c:1909  */
 };
 
 typedef union YYSTYPE YYSTYPE;
